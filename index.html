@@ -319,6 +319,132 @@
       color: #e57373;
     }
 
+    .moment-edit {
+      border: none;
+      background: none;
+      color: #ccc;
+      font-size: 0.9rem;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .moment-edit:hover {
+      color: var(--gold);
+    }
+
+    /* ── Edit modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--dark);
+    }
+
+    .modal label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    .modal textarea {
+      width: 100%;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      resize: none;
+      min-height: 80px;
+      outline: none;
+    }
+
+    .modal textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .modal input[type="date"] {
+      width: 100%;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      background: white;
+    }
+
+    .modal input[type="date"]:focus {
+      border-color: var(--gold);
+    }
+
+    .modal-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 50px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      background: white;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-save-edit {
+      flex: 2;
+      border: none;
+      border-radius: 50px;
+      padding: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: var(--gold);
+      color: #3a2e00;
+      cursor: pointer;
+    }
+
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -420,6 +546,31 @@
   <div class="view" id="view-summary">
     <div class="stats-bar" id="statsBar"></div>
     <div id="summaryContent"></div>
+  </div>
+
+  <!-- EDIT MODAL -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-title">Edit Moment</div>
+      <label>What happened</label>
+      <textarea id="editText" maxlength="280" oninput="updateEditCount()"></textarea>
+      <label>Date</label>
+      <input type="date" id="editDate" />
+      <label>Tag (optional)</label>
+      <div class="modal-tags" id="editTagsRow">
+        <div class="tag-chip" onclick="toggleTag(this)">😄 Joy</div>
+        <div class="tag-chip" onclick="toggleTag(this)">💪 Win</div>
+        <div class="tag-chip" onclick="toggleTag(this)">🤝 Connection</div>
+        <div class="tag-chip" onclick="toggleTag(this)">🧠 Growth</div>
+        <div class="tag-chip" onclick="toggleTag(this)">❤️ Gratitude</div>
+        <div class="tag-chip" onclick="toggleTag(this)">🎯 Focus</div>
+        <div class="tag-chip" onclick="toggleTag(this)">🌿 Calm</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="btn-save-edit" onclick="saveEdit()">Save Changes ✓</button>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
@@ -526,6 +677,55 @@
       showToast('Moment saved! 🌟');
     }
 
+    // ── Edit ─────────────────────────────────────────────────
+    let editingId = null;
+
+    function openEditModal(id) {
+      const moments = loadMoments();
+      const m = moments.find(m => m.id === id);
+      if (!m) return;
+      editingId = id;
+
+      document.getElementById('editText').value = m.text;
+      document.getElementById('editDate').value = m.dateKey;
+
+      // Reset and pre-select tags
+      document.querySelectorAll('#editTagsRow .tag-chip').forEach(chip => {
+        chip.classList.toggle('selected', m.tags.includes(chip.textContent.trim()));
+      });
+
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+      editingId = null;
+    }
+
+    function updateEditCount() {}
+
+    function saveEdit() {
+      const text = document.getElementById('editText').value.trim();
+      if (!text) return;
+
+      const newDate = document.getElementById('editDate').value;
+      const newTags = [...document.querySelectorAll('#editTagsRow .tag-chip.selected')]
+        .map(el => el.textContent.trim());
+
+      const moments = loadMoments();
+      const idx = moments.findIndex(m => m.id === editingId);
+      if (idx === -1) return;
+
+      moments[idx].text = text;
+      moments[idx].dateKey = newDate;
+      moments[idx].tags = newTags;
+
+      saveMoments(moments);
+      closeEditModal();
+      renderSummary();
+      showToast('Updated! ✓');
+    }
+
     // ── Delete ───────────────────────────────────────────────
     function deleteMoment(id) {
       const moments = loadMoments().filter(m => m.id !== id);
@@ -591,6 +791,7 @@
                 ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}
               </div>
             </div>
+            <button class="moment-edit" onclick="openEditModal(${m.id})" title="Edit">✏️</button>
             <button class="moment-delete" onclick="deleteMoment(${m.id})" title="Remove">✕</button>
           </div>
         `).join('');
