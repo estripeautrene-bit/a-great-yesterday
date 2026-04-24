@@ -44,7 +44,7 @@
     }
 
     header h1 {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.3px;
     }
@@ -501,9 +501,25 @@
 <body>
 
   <header>
-    <h1>A Great Yesterday ✨</h1>
+    <h1 id="headerGreeting">A Great Yesterday ✨</h1>
     <p class="date" id="headerDate"></p>
   </header>
+
+  <!-- NAME MODAL -->
+  <div class="modal-overlay" id="nameModal">
+    <div class="modal">
+      <div class="modal-title">Welcome! 👋</div>
+      <p style="font-size:0.95rem;color:var(--muted);margin-bottom:16px;">What's your first name? We'll personalize the app for you.</p>
+      <input type="text" id="nameInput" placeholder="Your first name" maxlength="30"
+        style="width:100%;border:1.5px solid #e0e0e0;border-radius:10px;padding:12px;font-size:1rem;font-family:inherit;outline:none;"
+        oninput="document.getElementById('nameSubmitBtn').disabled = this.value.trim().length === 0"
+        onkeydown="if(event.key==='Enter' && this.value.trim()) saveName()"
+      />
+      <div class="modal-actions" style="margin-top:16px;">
+        <button class="btn-save-edit" id="nameSubmitBtn" onclick="saveName()" disabled style="flex:1;">Let's go ✓</button>
+      </div>
+    </div>
+  </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('log')">+ Log a Moment</button>
@@ -619,6 +635,33 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
+
+    // ── Name & greeting ──────────────────────────────────────
+    const NAME_KEY = 'greatYesterday_name';
+
+    function saveName() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) return;
+      localStorage.setItem(NAME_KEY, name);
+      document.getElementById('nameModal').classList.remove('open');
+      applyGreeting(name);
+    }
+
+    function applyGreeting(name) {
+      document.getElementById('headerGreeting').textContent = name + ', have A Great Yesterday ✨';
+    }
+
+    function initName() {
+      const name = localStorage.getItem(NAME_KEY);
+      if (name) {
+        applyGreeting(name);
+      } else {
+        document.getElementById('nameModal').classList.add('open');
+        setTimeout(() => document.getElementById('nameInput').focus(), 100);
+      }
+    }
+
+    initName();
 
     // ── Header date ──────────────────────────────────────────
     document.getElementById('headerDate').textContent =
