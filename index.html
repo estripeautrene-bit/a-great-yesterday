@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <title>A Great Yesterday</title>
+  <title>DOPAmine</title>
   <style>
     * {
       box-sizing: border-box;
@@ -14,8 +14,8 @@
     }
 
     :root {
-      --gold: #f5c842;
-      --gold-light: #fdf3c0;
+      --gold: #7B2FBE;
+      --gold-light: #F4F0FA;
       --dark: #1a1a2e;
       --text: #2d2d2d;
       --muted: #888;
@@ -107,7 +107,7 @@
     .prompt-card p {
       font-size: 1rem;
       font-weight: 600;
-      color: #5a4a00;
+      color: white;
     }
 
     .input-area {
@@ -154,7 +154,7 @@
       padding: 10px 22px;
       font-size: 0.9rem;
       font-weight: 700;
-      color: #3a2e00;
+      color: white;
       cursor: pointer;
       transition: opacity 0.15s, transform 0.1s;
     }
@@ -191,7 +191,7 @@
     .tag-chip.selected {
       border-color: var(--gold);
       background: var(--gold-light);
-      color: #5a4a00;
+      color: #7B2FBE;
     }
 
     .tags-label {
@@ -298,7 +298,7 @@
     .moment-tag {
       font-size: 0.7rem;
       background: var(--gold-light);
-      color: #7a6200;
+      color: #7B2FBE;
       border-radius: 50px;
       padding: 2px 8px;
       font-weight: 600;
@@ -441,7 +441,7 @@
       font-size: 0.9rem;
       font-weight: 700;
       background: var(--gold);
-      color: #3a2e00;
+      color: white;
       cursor: pointer;
     }
 
@@ -494,14 +494,195 @@
 
     /* Streak flame */
     .streak-flame {
-      color: #ff8c00;
+      color: #7B2FBE;
+    }
+
+    /* ── Log tab streak pill ── */
+    .log-streak {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .log-streak.visible {
+      display: flex;
+    }
+
+    .log-streak-pill {
+      background: var(--gold-light);
+      color: #7B2FBE;
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    /* ── Yesterday tab ── */
+    .yesterday-hero {
+      text-align: center;
+      padding: 28px 0 20px;
+    }
+
+    .yesterday-headline {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .yesterday-subtitle {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .yesterday-empty {
+      font-size: 0.95rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .yesterday-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-left: 3px solid #7B2FBE;
+    }
+
+    .yesterday-card .moment-text {
+      font-size: 0.95rem;
+      line-height: 1.45;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .yesterday-card .moment-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .yesterday-list {
+      margin-top: 20px;
+    }
+
+    .yesterday-start-btn {
+      display: block;
+      width: 100%;
+      margin-top: 28px;
+      background: #7B2FBE;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* ── Auto time-of-day tag ── */
+    .moment-tag-auto {
+      font-size: 0.7rem;
+      background: #ede8f5;
+      color: #9b59c0;
+      border-radius: 50px;
+      padding: 2px 8px;
+      font-weight: 500;
+      font-style: italic;
+    }
+
+    /* ── Save ripple animation ── */
+    @keyframes ripple-out {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.4;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(6);
+        opacity: 0;
+      }
+    }
+
+    .save-ripple {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(123, 47, 190, 0.4);
+      pointer-events: none;
+      animation: ripple-out 0.4s ease-out forwards;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+    }
+
+    .save-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Delete confirmation modal ── */
+    .delete-modal-body {
+      text-align: center;
+      padding: 8px 0 4px;
+    }
+
+    .delete-modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 6px;
+    }
+
+    .delete-modal-sub {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .delete-modal-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-keep {
+      flex: 2;
+      border: none;
+      border-radius: 50px;
+      padding: 14px;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #7B2FBE;
+      color: white;
+      cursor: pointer;
+    }
+
+    .btn-delete-confirm {
+      flex: 1;
+      border: none;
+      border-radius: 50px;
+      padding: 14px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      background: #f5f5f5;
+      color: #DC2626;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1 id="headerGreeting">A Great Yesterday ✨</h1>
+    <h1 id="headerGreeting">DOPAmine ✨</h1>
     <p class="date" id="headerDate"></p>
   </header>
 
@@ -523,6 +704,7 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('log')">+ Log a Moment</button>
+    <button class="tab-btn" onclick="switchTab('yesterday')">Yesterday</button>
     <button class="tab-btn" onclick="switchTab('summary')">My Good Days</button>
   </div>
 
@@ -530,13 +712,17 @@
   <div class="view active" id="view-log">
     <div class="prompt-card">
       <div class="emoji">🌟</div>
-      <p>What's something good that just happened?</p>
+      <p>What just made you smile?</p>
+    </div>
+
+    <div class="log-streak" id="logStreak">
+      <span class="log-streak-pill" id="logStreakPill"></span>
     </div>
 
     <div class="input-area">
       <textarea
         id="momentInput"
-        placeholder="e.g. Had a great coffee chat with Sarah, finished a hard task, felt proud of myself..."
+        placeholder="What just made you smile?"
         maxlength="280"
         oninput="updateCharCount()"
       ></textarea>
@@ -556,6 +742,16 @@
       <div class="tag-chip" onclick="toggleTag(this)">🎯 Focus</div>
       <div class="tag-chip" onclick="toggleTag(this)">🌿 Calm</div>
     </div>
+  </div>
+
+  <!-- YESTERDAY VIEW -->
+  <div class="view" id="view-yesterday">
+    <div class="yesterday-hero">
+      <div class="yesterday-headline">Yesterday Was Good.</div>
+      <div id="yesterdaySubtitle" class="yesterday-subtitle"></div>
+    </div>
+    <div class="yesterday-list" id="yesterdayList"></div>
+    <button class="yesterday-start-btn" onclick="switchTab('log')">Start Today</button>
   </div>
 
   <!-- SUMMARY VIEW -->
@@ -585,6 +781,20 @@
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
         <button class="btn-save-edit" onclick="saveEdit()">Save Changes ✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="delete-modal-body">
+        <div class="delete-modal-title">Delete this moment?</div>
+        <div class="delete-modal-sub">This can't be undone.</div>
+        <div class="delete-modal-actions">
+          <button class="btn-keep" onclick="closeDeleteModal()">Keep It</button>
+          <button class="btn-delete-confirm" onclick="confirmDelete()">Delete</button>
+        </div>
       </div>
     </div>
   </div>
@@ -648,7 +858,7 @@
     }
 
     function applyGreeting(name) {
-      document.getElementById('headerGreeting').textContent = name + ', have A Great Yesterday ✨';
+      document.getElementById('headerGreeting').textContent = name + ', what just made you smile? ✨';
     }
 
     function initName() {
@@ -663,6 +873,13 @@
 
     initName();
 
+    // Auto-focus textarea on load if no name modal is shown
+    if (localStorage.getItem(NAME_KEY)) {
+      setTimeout(() => document.getElementById('momentInput').focus(), 100);
+    }
+
+    updateLogStreak();
+
     // ── Header date ──────────────────────────────────────────
     document.getElementById('headerDate').textContent =
       new Date().toLocaleDateString('en-US', {
@@ -673,11 +890,18 @@
     // ── Tabs ─────────────────────────────────────────────────
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach((b, i) => {
-        b.classList.toggle('active', (i === 0 && tab === 'log') || (i === 1 && tab === 'summary'));
+        b.classList.toggle('active',
+          (i === 0 && tab === 'log') ||
+          (i === 1 && tab === 'yesterday') ||
+          (i === 2 && tab === 'summary')
+        );
       });
       document.getElementById('view-log').classList.toggle('active', tab === 'log');
+      document.getElementById('view-yesterday').classList.toggle('active', tab === 'yesterday');
       document.getElementById('view-summary').classList.toggle('active', tab === 'summary');
       if (tab === 'summary') renderSummary();
+      if (tab === 'yesterday') renderYesterday();
+      if (tab === 'log') setTimeout(() => document.getElementById('momentInput').focus(), 50);
     }
 
     // ── Input / tag logic ────────────────────────────────────
@@ -696,20 +920,77 @@
         .map(el => el.textContent.trim());
     }
 
+    // ── Streak pill (Log tab) ────────────────────────────────
+    const STREAK_MILESTONES = {
+      3:   "You're building something real.",
+      7:   "One week. Your brain is changing.",
+      14:  "Two weeks of good moments.",
+      30:  "30 days. You have proof your life is good.",
+      50:  "50 days of dopamine. From the inside.",
+      100: "100 days. You are not the same person who started this."
+    };
+
+    function updateLogStreak() {
+      const moments = loadMoments();
+      const streak = calcStreak(moments);
+      const el = document.getElementById('logStreak');
+      const pill = document.getElementById('logStreakPill');
+      if (streak > 0) {
+        pill.textContent = '🔥 ' + streak + ' day streak';
+        el.classList.add('visible');
+      } else {
+        el.classList.remove('visible');
+      }
+    }
+
+    function checkStreakMilestone(streakBefore, streakAfter) {
+      if (STREAK_MILESTONES[streakAfter] && streakAfter !== streakBefore) {
+        setTimeout(() => showToast(STREAK_MILESTONES[streakAfter]), 400);
+      }
+    }
+
+    // ── Auto time-of-day tag ─────────────────────────────────
+    function getTimeOfDayTag() {
+      const hour = new Date().toLocaleString('en-US', {
+        hour: 'numeric', hour12: false, timeZone: 'America/Chicago'
+      });
+      const h = parseInt(hour, 10);
+      if (h >= 5  && h <= 11) return 'Morning';
+      if (h >= 12 && h <= 17) return 'Afternoon';
+      if (h >= 18 && h <= 22) return 'Evening';
+      return 'Night';
+    }
+
+    // ── Save ripple ──────────────────────────────────────────
+    function triggerRipple() {
+      const btn = document.getElementById('saveBtn');
+      const ripple = document.createElement('div');
+      ripple.className = 'save-ripple';
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 400);
+    }
+
     // ── Save ─────────────────────────────────────────────────
     function saveMoment() {
       const text = document.getElementById('momentInput').value.trim();
       if (!text) return;
 
-      const moments = loadMoments();
-      moments.unshift({
+      const momentsBefore = loadMoments();
+      const streakBefore = calcStreak(momentsBefore);
+
+      momentsBefore.unshift({
         id: Date.now(),
         text,
         tags: getSelectedTags(),
+        autoTag: getTimeOfDayTag(),
         createdAt: new Date().toISOString(),
         dateKey: todayKey()
       });
-      saveMoments(moments);
+      saveMoments(momentsBefore);
+
+      const streakAfter = calcStreak(momentsBefore);
+
+      triggerRipple();
 
       // Reset form
       document.getElementById('momentInput').value = '';
@@ -718,6 +999,8 @@
       document.querySelectorAll('.tag-chip.selected').forEach(el => el.classList.remove('selected'));
 
       showToast('Moment saved! 🌟');
+      updateLogStreak();
+      checkStreakMilestone(streakBefore, streakAfter);
     }
 
     // ── Edit ─────────────────────────────────────────────────
@@ -770,11 +1053,59 @@
     }
 
     // ── Delete ───────────────────────────────────────────────
+    let pendingDeleteId = null;
+
     function deleteMoment(id) {
-      const moments = loadMoments().filter(m => m.id !== id);
+      pendingDeleteId = id;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+      pendingDeleteId = null;
+    }
+
+    function confirmDelete() {
+      if (pendingDeleteId === null) return;
+      const moments = loadMoments().filter(m => m.id !== pendingDeleteId);
       saveMoments(moments);
+      closeDeleteModal();
       renderSummary();
       showToast('Removed');
+    }
+
+    // ── Yesterday ────────────────────────────────────────────
+    function yesterdayKey() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return d.toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+    }
+
+    function renderYesterday() {
+      const yKey = yesterdayKey();
+      const moments = loadMoments().filter(m => m.dateKey === yKey)
+        .slice().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+      const subtitle = document.getElementById('yesterdaySubtitle');
+      const list = document.getElementById('yesterdayList');
+
+      if (moments.length === 0) {
+        subtitle.innerHTML = '';
+        list.innerHTML = `<p class="yesterday-empty">Yesterday is a blank page.<br>Today doesn't have to be.</p>`;
+        return;
+      }
+
+      subtitle.textContent = `You captured ${moments.length} good moment${moments.length !== 1 ? 's' : ''}`;
+
+      list.innerHTML = moments.map(m => `
+        <div class="yesterday-card">
+          <div class="moment-text">${escapeHtml(m.text)}</div>
+          <div class="moment-meta">
+            <span class="moment-time">${formatTime(m.createdAt)}</span>
+            ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
     }
 
     // ── Summary ──────────────────────────────────────────────
@@ -807,7 +1138,8 @@
         container.innerHTML = `
           <div class="empty-state">
             <div class="big">✨</div>
-            <p>No moments yet.<br>Go log your first good thing!</p>
+            <p style="font-weight:600;color:var(--dark);margin-bottom:6px;">Your first good moment is waiting.</p>
+            <p>What just made you smile?</p>
           </div>`;
         return;
       }
@@ -831,7 +1163,7 @@
               <div class="moment-text">${escapeHtml(m.text)}</div>
               <div class="moment-meta">
                 <span class="moment-time">${formatTime(m.createdAt)}</span>
-                ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}
+                ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
               </div>
             </div>
             <button class="moment-edit" onclick="openEditModal(${m.id})" title="Edit">✏️</button>
