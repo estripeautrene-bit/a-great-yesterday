@@ -997,25 +997,9 @@
         <button class="photo-remove" onclick="removePhoto()" title="Remove photo">✕</button>
       </div>
 
-      <!-- Song input -->
-      <div class="song-input-wrap" id="songInputWrap">
-        <input type="text" id="songInput" class="song-input"
-          placeholder="Song name and artist..." maxlength="100"
-          onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('saveBtn').click();}" />
-        <div class="song-platform-row">
-          <button class="platform-btn" id="btnSpotify" onclick="selectPlatform('spotify')">🎵 Spotify</button>
-          <button class="platform-btn" id="btnYoutube" onclick="selectPlatform('youtube')">▶️ YouTube</button>
-          <button class="platform-btn" id="btnApple" onclick="selectPlatform('apple')">🍎 Apple Music</button>
-        </div>
-        <div style="font-size:0.75rem;color:#9ca3af;margin-top:6px;text-align:center;">
-          Select a platform above, then tap Save ✓ to attach the song
-        </div>
-      </div>
-
       <!-- Media buttons + save row -->
       <div class="media-row">
         <button class="media-btn" id="photoBtnToggle" onclick="togglePhotoCapture()">📷 Photo</button>
-        <button class="media-btn" id="songBtnToggle" onclick="toggleSongInput()">🎵 Song</button>
         <input type="file" id="photoInput" accept="image/*"
           style="display:none" onchange="handlePhotoSelect(event)" />
       </div>
@@ -1355,58 +1339,14 @@
       document.getElementById('photoBtnToggle').classList.remove('active');
     }
 
-    // ── Song input ───────────────────────────────────────────
-    let selectedPlatform = 'spotify';
-
-    function toggleSongInput() {
-      const wrap = document.getElementById('songInputWrap');
-      const btn = document.getElementById('songBtnToggle');
-      const isVisible = wrap.classList.contains('visible');
-      wrap.classList.toggle('visible', !isVisible);
-      btn.classList.toggle('active', !isVisible);
-      if (!isVisible) {
-        selectedPlatform = 'spotify';
-        // Visually select Spotify by default
-        document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById('btnSpotify').classList.add('selected');
-        setTimeout(() => document.getElementById('songInput').focus(), 50);
-      }
-    }
-
-    function selectPlatform(platform) {
-      selectedPlatform = platform;
-      document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
-      const map = { spotify: 'btnSpotify', youtube: 'btnYoutube', apple: 'btnApple' };
-      document.getElementById(map[platform]).classList.add('selected');
-    }
-
-    function buildSongLink(songName, platform) {
-      const q = encodeURIComponent(songName);
-      if (platform === 'spotify')
-        return `https://open.spotify.com/search/${q}`;
-      if (platform === 'youtube')
-        return `https://www.youtube.com/results?search_query=${q}`;
-      if (platform === 'apple')
-        return `https://music.apple.com/search?term=${q}`;
-      return '';
-    }
-
     function resetMediaInputs() {
       removePhoto();
-      document.getElementById('songInput').value = '';
-      document.getElementById('songInputWrap').classList.remove('visible');
-      document.getElementById('songBtnToggle').classList.remove('active');
-      selectedPlatform = 'spotify';
     }
 
     // ── Save ─────────────────────────────────────────────────
     function saveMoment() {
       const text = document.getElementById('momentInput').value.trim();
       if (!text) return;
-
-      const songName = document.getElementById('songInput').value.trim();
-      const songLink = songName ? buildSongLink(songName, selectedPlatform) : null;
-      const songLabel = songName ? `${songName}` : null;
 
       const momentsBefore = loadMoments();
       const streakBefore = calcStreak(momentsBefore);
@@ -1419,9 +1359,6 @@
         createdAt: new Date().toISOString(),
         dateKey: todayKey(),
         photo: currentPhotoData || null,
-        song: songLabel || null,
-        songLink: songLink || null,
-        songPlatform: songName ? selectedPlatform : null,
       });
       saveMoments(momentsBefore);
 
@@ -1429,7 +1366,6 @@
 
       triggerRipple();
 
-      // Reset form
       document.getElementById('momentInput').value = '';
       document.getElementById('charCount').textContent = '0';
       document.getElementById('saveBtn').disabled = true;
@@ -1539,10 +1475,6 @@
         <div class="yesterday-card">
           <div class="moment-text">${escapeHtml(m.text)}</div>
           ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
-          ${m.song ? `<a class="card-song" href="${m.songLink}" target="_blank" rel="noopener">
-            ${m.songPlatform === 'youtube' ? '▶️' : m.songPlatform === 'apple' ? '🍎' : '🎵'}
-            ${escapeHtml(m.song)}
-          </a>` : ''}
           <div class="moment-meta">
             <span class="moment-time">${formatTime(m.createdAt)}</span>
             ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
@@ -1605,10 +1537,6 @@
             <div class="moment-body">
               <div class="moment-text">${escapeHtml(m.text)}</div>
               ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
-              ${m.song ? `<a class="card-song" href="${m.songLink}" target="_blank" rel="noopener">
-                ${m.songPlatform === 'youtube' ? '▶️' : m.songPlatform === 'apple' ? '🍎' : '🎵'}
-                ${escapeHtml(m.song)}
-              </a>` : ''}
               <div class="moment-meta">
                 <span class="moment-time">${formatTime(m.createdAt)}</span>
                 ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
