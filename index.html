@@ -175,8 +175,151 @@
       cursor: default;
     }
 
-    /* Tag chips */
-    .tags-row {
+    /* ── Media attachments (photo + song) ── */
+    .media-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #f0f0f0;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .media-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 50px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: white;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .media-btn:hover {
+      border-color: var(--gold);
+      color: #7B2FBE;
+    }
+
+    .media-btn.active {
+      border-color: var(--gold);
+      background: var(--gold-light);
+      color: #7B2FBE;
+    }
+
+    .photo-preview {
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      position: relative;
+    }
+
+    .photo-preview img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+    }
+
+    .photo-preview.visible { display: block; }
+
+    .photo-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .song-input-wrap {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .song-input-wrap.visible { display: block; }
+
+    .song-input {
+      width: 100%;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .song-input:focus { border-color: var(--gold); }
+
+    .song-platform-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .platform-btn {
+      flex: 1;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 50px;
+      padding: 6px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: white;
+      cursor: pointer;
+      color: var(--muted);
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      text-align: center;
+    }
+
+    .platform-btn.selected {
+      border-color: var(--gold);
+      background: var(--gold-light);
+      color: #7B2FBE;
+    }
+
+    /* ── Media display on moment cards ── */
+    .card-photo {
+      width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+      max-height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-song {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #7B2FBE;
+      font-weight: 600;
+      text-decoration: none;
+      background: var(--gold-light);
+      border-radius: 50px;
+      padding: 4px 10px;
+    }
+
+    .card-song:hover { opacity: 0.8; }
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
@@ -742,6 +885,32 @@
         maxlength="280"
         oninput="updateCharCount()"
       ></textarea>
+
+      <!-- Photo preview -->
+      <div class="photo-preview" id="photoPreview">
+        <img id="photoImg" src="" alt="moment photo" />
+        <button class="photo-remove" onclick="removePhoto()" title="Remove photo">✕</button>
+      </div>
+
+      <!-- Song input -->
+      <div class="song-input-wrap" id="songInputWrap">
+        <input type="text" id="songInput" class="song-input"
+          placeholder="Song name and artist..." maxlength="100" />
+        <div class="song-platform-row">
+          <button class="platform-btn" id="btnSpotify" onclick="selectPlatform('spotify')">🎵 Spotify</button>
+          <button class="platform-btn" id="btnYoutube" onclick="selectPlatform('youtube')">▶️ YouTube</button>
+          <button class="platform-btn" id="btnApple" onclick="selectPlatform('apple')">🍎 Apple Music</button>
+        </div>
+      </div>
+
+      <!-- Media buttons + save row -->
+      <div class="media-row">
+        <button class="media-btn" id="photoBtnToggle" onclick="togglePhotoCapture()">📷 Photo</button>
+        <button class="media-btn" id="songBtnToggle" onclick="toggleSongInput()">🎵 Song</button>
+        <input type="file" id="photoInput" accept="image/*" capture="environment"
+          style="display:none" onchange="handlePhotoSelect(event)" />
+      </div>
+
       <div class="input-footer">
         <span class="char-count"><span id="charCount">0</span>/280</span>
         <button class="save-btn" id="saveBtn" onclick="saveMoment()" disabled>Save ✓</button>
@@ -1031,10 +1200,100 @@
       setTimeout(() => ripple.remove(), 400);
     }
 
+    // ── Photo capture ────────────────────────────────────────
+    let currentPhotoData = null;
+
+    function togglePhotoCapture() {
+      document.getElementById('photoInput').click();
+    }
+
+    function handlePhotoSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // Compress image using canvas before storing
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const MAX = 800;
+          let w = img.width, h = img.height;
+          if (w > MAX) { h = h * MAX / w; w = MAX; }
+          if (h > MAX) { w = w * MAX / h; h = MAX; }
+          canvas.width = w;
+          canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          currentPhotoData = canvas.toDataURL('image/jpeg', 0.7);
+
+          // Show preview
+          document.getElementById('photoImg').src = currentPhotoData;
+          document.getElementById('photoPreview').classList.add('visible');
+          document.getElementById('photoBtnToggle').classList.add('active');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+      // Reset input so same file can be selected again
+      event.target.value = '';
+    }
+
+    function removePhoto() {
+      currentPhotoData = null;
+      document.getElementById('photoImg').src = '';
+      document.getElementById('photoPreview').classList.remove('visible');
+      document.getElementById('photoBtnToggle').classList.remove('active');
+    }
+
+    // ── Song input ───────────────────────────────────────────
+    let selectedPlatform = 'spotify';
+
+    function toggleSongInput() {
+      const wrap = document.getElementById('songInputWrap');
+      const btn = document.getElementById('songBtnToggle');
+      const isVisible = wrap.classList.contains('visible');
+      wrap.classList.toggle('visible', !isVisible);
+      btn.classList.toggle('active', !isVisible);
+      if (!isVisible) {
+        selectPlatform('spotify');
+        setTimeout(() => document.getElementById('songInput').focus(), 50);
+      }
+    }
+
+    function selectPlatform(platform) {
+      selectedPlatform = platform;
+      document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
+      const map = { spotify: 'btnSpotify', youtube: 'btnYoutube', apple: 'btnApple' };
+      document.getElementById(map[platform]).classList.add('selected');
+    }
+
+    function buildSongLink(songName, platform) {
+      const q = encodeURIComponent(songName);
+      if (platform === 'spotify')
+        return `https://open.spotify.com/search/${q}`;
+      if (platform === 'youtube')
+        return `https://www.youtube.com/results?search_query=${q}`;
+      if (platform === 'apple')
+        return `https://music.apple.com/search?term=${q}`;
+      return '';
+    }
+
+    function resetMediaInputs() {
+      removePhoto();
+      document.getElementById('songInput').value = '';
+      document.getElementById('songInputWrap').classList.remove('visible');
+      document.getElementById('songBtnToggle').classList.remove('active');
+      selectedPlatform = 'spotify';
+    }
+
     // ── Save ─────────────────────────────────────────────────
     function saveMoment() {
       const text = document.getElementById('momentInput').value.trim();
       if (!text) return;
+
+      const songName = document.getElementById('songInput').value.trim();
+      const songLink = songName ? buildSongLink(songName, selectedPlatform) : null;
+      const songLabel = songName ? `${songName}` : null;
 
       const momentsBefore = loadMoments();
       const streakBefore = calcStreak(momentsBefore);
@@ -1045,7 +1304,11 @@
         tags: getSelectedTags(),
         autoTag: getTimeOfDayTag(),
         createdAt: new Date().toISOString(),
-        dateKey: todayKey()
+        dateKey: todayKey(),
+        photo: currentPhotoData || null,
+        song: songLabel || null,
+        songLink: songLink || null,
+        songPlatform: songName ? selectedPlatform : null,
       });
       saveMoments(momentsBefore);
 
@@ -1058,6 +1321,7 @@
       document.getElementById('charCount').textContent = '0';
       document.getElementById('saveBtn').disabled = true;
       document.querySelectorAll('.tag-chip.selected').forEach(el => el.classList.remove('selected'));
+      resetMediaInputs();
 
       showToast('Moment saved! 🌟');
       updateLogStreak();
@@ -1161,6 +1425,11 @@
       list.innerHTML = moments.map(m => `
         <div class="yesterday-card">
           <div class="moment-text">${escapeHtml(m.text)}</div>
+          ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
+          ${m.song ? `<a class="card-song" href="${m.songLink}" target="_blank" rel="noopener">
+            ${m.songPlatform === 'youtube' ? '▶️' : m.songPlatform === 'apple' ? '🍎' : '🎵'}
+            ${escapeHtml(m.song)}
+          </a>` : ''}
           <div class="moment-meta">
             <span class="moment-time">${formatTime(m.createdAt)}</span>
             ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
@@ -1222,6 +1491,11 @@
             <div class="moment-dot"></div>
             <div class="moment-body">
               <div class="moment-text">${escapeHtml(m.text)}</div>
+              ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
+              ${m.song ? `<a class="card-song" href="${m.songLink}" target="_blank" rel="noopener">
+                ${m.songPlatform === 'youtube' ? '▶️' : m.songPlatform === 'apple' ? '🍎' : '🎵'}
+                ${escapeHtml(m.song)}
+              </a>` : ''}
               <div class="moment-meta">
                 <span class="moment-time">${formatTime(m.createdAt)}</span>
                 ${m.tags.map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
