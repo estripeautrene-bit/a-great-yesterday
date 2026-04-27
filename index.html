@@ -1156,6 +1156,78 @@
     body.light-mode .feel-textarea::placeholder {
       color: rgba(0,0,0,0.3) !important;
     }
+
+    /* ── Shareable progress card ── */
+    .share-section { margin-top: 24px; }
+
+    .share-card {
+      background: linear-gradient(135deg, #1A1A2E 0%, #2D1B69 100%);
+      border: 1px solid rgba(123,47,190,0.5);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .share-card::before {
+      content: '';
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,190,0.3), transparent 70%);
+      top: -60px; right: -60px;
+    }
+
+    .share-card-logo {
+      font-size: 1rem; font-weight: 900; color: white;
+      letter-spacing: -0.5px; margin-bottom: 16px; position: relative;
+    }
+    .share-card-logo span { color: #B57BF7; font-weight: 400; }
+
+    .share-card-num {
+      font-size: 3.5rem; font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, #ffffff, #B57BF7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 4px;
+    }
+
+    .share-card-num-label {
+      font-size: 0.7rem; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px;
+    }
+
+    .share-card-stats {
+      display: flex; justify-content: center; gap: 24px; margin-bottom: 16px;
+    }
+
+    .share-card-stat-num {
+      font-size: 1.3rem; font-weight: 800; color: #B57BF7; line-height: 1;
+    }
+
+    .share-card-stat-label {
+      font-size: 0.6rem; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px;
+    }
+
+    .share-card-tagline {
+      font-size: 0.72rem; color: rgba(255,255,255,0.3);
+      font-style: italic; margin-bottom: 16px;
+    }
+
+    .share-btn {
+      background: linear-gradient(135deg, #7B2FBE, #B57BF7);
+      color: white; border: none; border-radius: 50px;
+      padding: 12px 28px; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; width: 100%;
+      box-shadow: 0 4px 20px rgba(123,47,190,0.4);
+    }
+
+    .share-hint {
+      font-size: 0.72rem; color: rgba(255,255,255,0.3);
+      text-align: center; margin-top: 8px; font-style: italic;
+    }
+
     .progress-hero {
       text-align: center;
       padding: 24px 0 20px;
@@ -2334,6 +2406,21 @@
       // Scroll panel into view
       setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
     }
+    // ── Share progress ───────────────────────────────────────
+    function shareProgress() {
+      const moments = loadMoments();
+      const streak = calcStreak(moments);
+      if (navigator.share) {
+        navigator.share({
+          title: 'DOPAmine — My Progress',
+          text: `🔥 ${streak} day streak · ${moments.length} good moments captured\n\nBuilding my dopamine from the inside.\n\nmydopa.app`,
+          url: 'https://mydopa.app'
+        }).catch(() => {});
+      } else {
+        showToast('Screenshot your progress card and share it! 📸');
+      }
+    }
+
     function openNextStep() {
       document.getElementById('nextStepModal').classList.add('open');
     }
@@ -2978,7 +3065,193 @@
       return d.toLocaleDateString('en-CA', { timeZone: TZ });
     }
 
-    // ── Wisdom seed library ──────────────────────────────────
+    // ── Reflection question library ──────────────────────────
+    const REFLECT_Q = {
+      mindset: {
+        early: [
+          "Looking at yesterday's moments — what does that tell you about what you're actually capable of?",
+          "Which moment from yesterday surprised you most about yourself?",
+          "If yesterday's good moments were evidence in a court case — what would they prove about you?",
+          "What did yesterday show you that you might have talked yourself out of believing?",
+          "Is there a story you tell yourself about who you are that yesterday gently contradicted?",
+        ],
+        mid: [
+          "After weeks of capturing — what belief about yourself is slowly becoming harder to hold onto?",
+          "What pattern in your moments tells you something is shifting in how you see yourself?",
+          "The person who started this practice and the person reading this now — what's different?",
+          "What would the version of you from six months ago think about yesterday's entries?",
+          "Which of yesterday's moments represents something you used to think you couldn't do or have?",
+        ],
+        advanced: [
+          "You've been documenting your life accurately for a while now. What does the honest version of your story say?",
+          "What does your archive prove about you that your worst days tried to disprove?",
+          "The limiting belief that brought you here — how much power does it still have?",
+          "If consistency is your identity now — what else becomes possible from that identity?",
+          "What do you know about yourself now that you couldn't have known on day one?",
+        ],
+      },
+      body: {
+        early: [
+          "Did any of yesterday's good moments involve how your body felt or moved? What does that tell you?",
+          "When was the last time you noticed your body doing something well? Did yesterday have one of those moments?",
+          "Your body was present for everything good that happened yesterday. What did it feel like to be in it?",
+          "Pick one moment from yesterday. Not what happened — how it felt physically when it did.",
+          "What does yesterday tell you about the relationship between how you move and how you feel?",
+        ],
+        mid: [
+          "Looking at your body-related moments over recent weeks — what pattern is emerging?",
+          "Energy, movement, rest, strength — which of these showed up in yesterday's good moments?",
+          "What does your body know about yesterday that your mind hasn't fully acknowledged yet?",
+          "If your body could describe yesterday in one word — what would it say?",
+          "Which of yesterday's moments happened because your body was working well for you?",
+        ],
+        advanced: [
+          "Your body has shown up for every moment you've captured. What has it earned from your attention?",
+          "What does consistent noticing do to the relationship between your mind and your body?",
+          "Energy is either building or depleting every day. What did yesterday's evidence tell you?",
+          "If physical discipline is part of who you are — what does yesterday confirm about that?",
+          "What would it mean to give your body the same consistent attention you've given this practice?",
+        ],
+      },
+      emotions: {
+        early: [
+          "Pick one moment from yesterday. Not what happened — how it felt inside when it did.",
+          "Which of yesterday's moments made you feel most like yourself?",
+          "Was there a moment yesterday where you felt something shift inside? What was it?",
+          "If yesterday had a feeling — not a story, a feeling — what would you name it?",
+          "When you read yesterday's entries just now, what did you feel in your body reading them?",
+        ],
+        mid: [
+          "Looking at recent weeks of moments — what emotion shows up most often that you hadn't noticed before?",
+          "Which of yesterday's moments came from inside you — from your own choices — rather than from outside events?",
+          "What does your emotional response to yesterday's entries tell you about what you value?",
+          "Is there a feeling you've been waiting for someone else to give you that yesterday showed you can generate yourself?",
+          "What did yesterday feel like from the inside — beneath the events, beneath the entries?",
+        ],
+        advanced: [
+          "You've been building internal dopamine for a while. How has your relationship with external validation changed?",
+          "What emotions are you generating through your own consistent effort that used to come only from outside?",
+          "When you feel good now — where does that goodness come from? Is it different than before?",
+          "Which feeling from yesterday came entirely from within you, independent of what anyone else did or said?",
+          "What does it feel like to be someone who generates their own emotional state rather than waits for it?",
+        ],
+      },
+      goals: {
+        early: [
+          "If yesterday was a page in the story of who you're becoming — what's the title of that page?",
+          "Which of yesterday's moments points toward something you want more of in your life?",
+          "What did yesterday tell you about the direction you're actually moving in?",
+          "Is there a pattern in your good moments that suggests what you should be doing more of?",
+          "If yesterday's good things were clues about your best future — what would they be pointing to?",
+        ],
+        mid: [
+          "Looking at your recent moments — what goal is being quietly built by your daily consistency?",
+          "Which area of your life is generating the most good moments? What does that tell you about where to invest?",
+          "What would it look like to apply the same consistency you've built here to one specific goal?",
+          "Yesterday's good moments were not accidents. What intention is creating them?",
+          "The system you've built here — what other systems in your life could be built the same way?",
+        ],
+        advanced: [
+          "You've proven you can build and maintain a system. What goal is worthy of that same discipline?",
+          "Your archive shows what consistently brings you good moments. What life are you designing around that?",
+          "What would the next version of this practice look like — deeper, broader, more intentional?",
+          "You know how to build momentum now. What direction do you want to aim it?",
+          "If your consistency here is chapter one — what is chapter two?",
+        ],
+      },
+    };
+
+    const REFLECT_Q_KEY = 'dopamine_reflect_';
+
+    function getReflectionQuestion(moments) {
+      const stage = getStage();
+      // Detect dominant pillar from tags
+      const tagCounts = { mindset: 0, body: 0, emotions: 0, goals: 0 };
+      moments.forEach(m => {
+        (m.tags || []).forEach(t => {
+          if (['😄 Joy','💪 Win','🧠 Growth'].includes(t)) tagCounts.mindset++;
+          if (['🏃 Active','🏋️ Gym'].includes(t)) tagCounts.body++;
+          if (['❤️ Gratitude','🤝 Connection','🌿 Calm','🍸 Cheers'].includes(t)) tagCounts.emotions++;
+          if (['🎯 Focus','💪 Win'].includes(t)) tagCounts.goals++;
+        });
+      });
+      const dominant = Object.entries(tagCounts).sort((a,b) => b[1]-a[1])[0];
+      const pillar = dominant[1] > 0 ? dominant[0] : 'emotions';
+      const pool = REFLECT_Q[pillar][stage];
+      const idx = getCardIndex() % pool.length;
+      return { question: pool[idx], pillar };
+    }
+
+    function saveReflection() {
+      const yKey = yesterdayKey();
+      const text = document.getElementById('reflectInput').value.trim();
+      if (!text) return;
+      localStorage.setItem(REFLECT_Q_KEY + yKey, text);
+      document.getElementById('reflectInput').disabled = true;
+      document.getElementById('reflectSaveBtn').style.display = 'none';
+      document.getElementById('reflectSaved').style.display = 'block';
+    }
+
+    function renderYesterday() {
+      const yKey = yesterdayKey();
+      const moments = loadMoments().filter(m => m.dateKey === yKey)
+        .slice().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+
+      const subtitle = document.getElementById('yesterdaySubtitle');
+      const list = document.getElementById('yesterdayList');
+      const wisdom = document.getElementById('yesterdayWisdom');
+      const feel = document.getElementById('yesterdayFeel');
+
+      if (moments.length === 0) {
+        subtitle.innerHTML = '';
+        wisdom.innerHTML = '';
+        feel.innerHTML = '';
+        list.innerHTML = `<p class="yesterday-empty">Yesterday is a blank page.<br>Today doesn't have to be.</p>`;
+        return;
+      }
+
+      // ── Subtitle ──
+      subtitle.textContent = `You chose to notice ${moments.length} time${moments.length !== 1 ? 's' : ''} yesterday.`;
+
+      // ── Smart wisdom seed ──
+      const seed = getWisdomSeed(moments);
+      wisdom.innerHTML = `
+        <div class="wisdom-seed">
+          <div class="wisdom-seed-label">✦ From the DOPAmine philosophy</div>
+          <div class="wisdom-seed-text">${seed}</div>
+        </div>`;
+
+      // ── Entries ──
+      list.innerHTML = moments.map(m => `
+        <div class="yesterday-card">
+          <div class="moment-text">${escapeHtml(m.text)}</div>
+          ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
+          <div class="moment-meta">
+            <span class="moment-time">${formatTime(m.createdAt)}</span>
+            ${(m.tags || []).map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}
+            ${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
+
+      // ── Reflection question ──
+      const { question, pillar } = getReflectionQuestion(moments);
+      const pillarLabel = { mindset: '🧠 Mindset', body: '💪 Body', emotions: '❤️ Emotions', goals: '🎯 Goals' }[pillar];
+      const savedReflection = localStorage.getItem(REFLECT_Q_KEY + yKey);
+
+      feel.innerHTML = `
+        <div class="feel-section">
+          <div class="feel-label">${question}</div>
+          <textarea class="feel-textarea" id="reflectInput"
+            placeholder="Take a moment to reflect..."
+            ${savedReflection ? 'disabled' : ''}>${savedReflection || ''}</textarea>
+          ${savedReflection
+            ? `<div id="reflectSaved" style="text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
+            : `<button class="feel-save-btn" id="reflectSaveBtn" onclick="saveReflection()">Save my reflection</button>
+               <div id="reflectSaved" style="display:none;text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
+          }
+        </div>`;
+    }
     const WISDOM_SEEDS = {
       mindset: [
         "Trust your consistency more than you trust your feelings. Trust your doing more than your feeling.",
@@ -3172,6 +3445,28 @@
 
         <!-- Motivator -->
         <div class="progress-motivator" id="progressMotivator"></div>
+
+        <!-- Shareable card -->
+        <div class="share-section">
+          <div class="share-card" id="shareCard">
+            <div class="share-card-logo">DOPA<span>mine</span></div>
+            <div class="share-card-num">${moments.length}</div>
+            <div class="share-card-num-label">Good moments captured</div>
+            <div class="share-card-stats">
+              <div class="share-card-stat">
+                <div class="share-card-stat-num">🔥 ${streak}</div>
+                <div class="share-card-stat-label">Day streak</div>
+              </div>
+              <div class="share-card-stat">
+                <div class="share-card-stat-num">${totalDays}</div>
+                <div class="share-card-stat-label">Active days</div>
+              </div>
+            </div>
+            <div class="share-card-tagline">Your tomorrow is being written right now.</div>
+          </div>
+          <button class="share-btn" onclick="shareProgress()">📤 Share my progress</button>
+          <div class="share-hint">Screenshot and share on WhatsApp or Instagram</div>
+        </div>
       `;
 
       // ── Build 30-day dot calendar ──
