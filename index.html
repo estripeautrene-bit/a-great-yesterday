@@ -36,7 +36,7 @@
     body.light-mode {
       --bg: #F4F0FA;
       --text: #1A1A2E;
-      --muted: rgba(0,0,0,0.4);
+      --muted: rgba(0,0,0,0.5);
       --card: #ffffff;
       --card-border: rgba(123,47,190,0.2);
     }
@@ -51,20 +51,30 @@
     }
 
     body.light-mode .tab-btn {
-      color: rgba(26,26,46,0.45) !important;
+      color: rgba(26,26,46,0.5) !important;
     }
 
     body.light-mode .tab-btn.active {
-      color: #7B2FBE !important;
+      color: #5B1FA0 !important;
+      border-bottom-color: #5B1FA0 !important;
     }
 
     body.light-mode .view {
       background: #F4F0FA !important;
     }
 
+    body.light-mode .prompt-card {
+      background: linear-gradient(135deg, rgba(123,47,190,0.15), rgba(123,47,190,0.05)) !important;
+      border: 1px solid rgba(123,47,190,0.25) !important;
+    }
+
+    body.light-mode .prompt-card p {
+      color: #3D1580 !important;
+    }
+
     body.light-mode .input-area {
       background: white !important;
-      border-color: rgba(123,47,190,0.2) !important;
+      border-color: rgba(123,47,190,0.25) !important;
     }
 
     body.light-mode .input-area textarea {
@@ -75,11 +85,32 @@
       color: rgba(0,0,0,0.3) !important;
     }
 
+    body.light-mode .input-footer {
+      border-top-color: rgba(0,0,0,0.08) !important;
+    }
+
+    body.light-mode .char-count {
+      color: rgba(0,0,0,0.3) !important;
+    }
+
+    body.light-mode .log-streak-pill {
+      background: rgba(123,47,190,0.15) !important;
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .log-streak-meaning {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .media-btn {
+      border-color: rgba(0,0,0,0.15) !important;
+      color: rgba(0,0,0,0.5) !important;
+      background: white !important;
+    }
+
     body.light-mode .moment-card,
     body.light-mode .yesterday-card,
-    body.light-mode .stat-box,
     body.light-mode .quick-stat,
-    body.light-mode .science-card,
     body.light-mode .day-detail-panel,
     body.light-mode .day-detail-card {
       background: white !important;
@@ -87,27 +118,162 @@
     }
 
     body.light-mode .moment-text,
-    body.light-mode .yesterday-card .moment-text,
     body.light-mode .day-detail-text {
       color: #1A1A2E !important;
     }
 
-    body.light-mode .prompt-card {
-      background: linear-gradient(135deg, rgba(123,47,190,0.15), rgba(123,47,190,0.05)) !important;
+    body.light-mode .moment-time,
+    body.light-mode .day-detail-meta,
+    body.light-mode .day-count {
+      color: rgba(0,0,0,0.4) !important;
     }
 
-    body.light-mode .progress-motivator,
-    body.light-mode .top-tag-bubble,
-    body.light-mode .science-card-step,
-    body.light-mode .mood-picker {
+    body.light-mode .moment-tag {
+      background: rgba(123,47,190,0.12) !important;
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .science-card {
       background: white !important;
+      border-color: rgba(123,47,190,0.25) !important;
+    }
+
+    body.light-mode .science-card-label {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .science-card-headline {
+      color: #1A1A2E !important;
+    }
+
+    body.light-mode .science-card-headline span {
+      color: #7B2FBE !important;
+    }
+
+    body.light-mode .science-step-icon {
+      background: rgba(123,47,190,0.12) !important;
+      border-color: rgba(123,47,190,0.25) !important;
+    }
+
+    body.light-mode .science-step-text {
+      color: #2D2D2D !important;
+    }
+
+    body.light-mode .science-step-text strong {
+      color: #1A1A2E !important;
+    }
+
+    body.light-mode .science-card-divider {
+      background: rgba(123,47,190,0.15) !important;
+    }
+
+    body.light-mode .science-card-bottom {
+      color: rgba(0,0,0,0.55) !important;
+    }
+
+    body.light-mode .science-card-bottom strong {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .science-card-hint {
+      color: rgba(0,0,0,0.3) !important;
+    }
+
+    body.light-mode .science-card-stats .science-stat {
+      background: rgba(123,47,190,0.08) !important;
+      border-color: rgba(123,47,190,0.2) !important;
+    }
+
+    body.light-mode .progress-hero .progress-total-label {
+      color: rgba(0,0,0,0.4) !important;
+    }
+
+    body.light-mode .progress-streak-row {
+      background: rgba(123,47,190,0.1) !important;
+      border-color: rgba(123,47,190,0.25) !important;
+    }
+
+    body.light-mode .progress-streak-meaning {
+      color: rgba(0,0,0,0.4) !important;
+    }
+
+    body.light-mode .progress-section-label {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .dot-day {
+      background: rgba(0,0,0,0.06) !important;
+      border-color: rgba(0,0,0,0.1) !important;
+    }
+
+    body.light-mode .dot-day.active {
+      background: linear-gradient(135deg, #7B2FBE, #B57BF7) !important;
+      border-color: transparent !important;
+    }
+
+    body.light-mode .dot-num {
+      color: rgba(0,0,0,0.4) !important;
+    }
+
+    body.light-mode .dot-day.active .dot-num {
+      color: white !important;
+    }
+
+    body.light-mode .top-tag-bubble {
+      background: rgba(123,47,190,0.08) !important;
+      border-color: rgba(123,47,190,0.2) !important;
+    }
+
+    body.light-mode .top-tag-name {
+      color: rgba(0,0,0,0.4) !important;
+    }
+
+    body.light-mode .progress-motivator {
+      background: white !important;
+      border-color: rgba(123,47,190,0.2) !important;
+      color: #2D2D2D !important;
+    }
+
+    body.light-mode .progress-motivator strong {
+      color: #1A1A2E !important;
+    }
+
+    body.light-mode .quick-stat-num {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .quick-stat-label {
+      color: rgba(0,0,0,0.4) !important;
     }
 
     body.light-mode .empty-state {
-      color: rgba(26,26,46,0.4) !important;
+      color: rgba(0,0,0,0.35) !important;
     }
 
-    /* ── Theme toggle ── */
+    body.light-mode .mood-picker {
+      background: rgba(123,47,190,0.05) !important;
+      border-color: rgba(123,47,190,0.2) !important;
+    }
+
+    body.light-mode .mood-chip {
+      border-color: rgba(0,0,0,0.1) !important;
+    }
+
+    body.light-mode .day-label {
+      color: #5B1FA0 !important;
+    }
+
+    body.light-mode .yesterday-hero {
+      background: linear-gradient(135deg, rgba(123,47,190,0.15), rgba(123,47,190,0.05)) !important;
+    }
+
+    body.light-mode .yesterday-headline {
+      color: #1A1A2E !important;
+    }
+
+    body.light-mode .yesterday-subtitle {
+      color: rgba(0,0,0,0.5) !important;
+    }
     .theme-toggle {
       background: rgba(255,255,255,0.1);
       border: 1px solid rgba(255,255,255,0.2);
