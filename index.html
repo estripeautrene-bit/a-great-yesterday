@@ -2428,103 +2428,282 @@
     }
 
     // ── Science visual cards ─────────────────────────────────
-    const SCIENCE_CARDS = {
-      morning: `
-        <div class="science-card-label">🧠 The Dopamine Loop</div>
-        <div class="science-card-headline">You do something good.<br><span>Your brain remembers.</span></div>
-        <div class="science-card-steps">
-          <div class="science-card-step">
-            <div class="science-step-icon">✓</div>
-            <div class="science-step-text"><strong>Do</strong> something meaningful</div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">⚡</div>
-            <div class="science-step-text"><strong>Dopamine</strong> is released</div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">🧠</div>
-            <div class="science-step-text">Brain says: <strong>"This matters — remember this"</strong></div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">🔄</div>
-            <div class="science-step-text">You're <strong>more likely to repeat it</strong></div>
-          </div>
-        </div>
+    // ── 75-Card Stage-Based Science System ───────────────────
+    function makeCard(label, headline, steps, tagline) {
+      const stepHTML = steps.map((s, i) => `
+        <div class="science-card-step">
+          <div class="science-step-icon">${i + 1}</div>
+          <div class="science-step-text"><strong>${s[0]}</strong> — ${s[1]}</div>
+        </div>`).join('');
+      return `
+        <div class="science-card-label">${label}</div>
+        <div class="science-card-headline">${headline}</div>
+        <div class="science-card-steps">${stepHTML}</div>
         <div class="science-card-divider"></div>
-        <div class="science-card-bottom">DOPAmine trains your brain to seek more of <strong>what matters.</strong></div>`,
+        <div class="science-card-bottom">👉 <strong>${tagline}</strong></div>`;
+    }
 
-      afternoon: `
-        <div class="science-card-label">📈 How Consistency Works</div>
-        <div class="science-card-headline"><span>Consistency</span> builds<br>more dopamine.</div>
-        <div class="science-card-steps">
-          <div class="science-card-step">
-            <div class="science-step-icon">1</div>
-            <div class="science-step-text"><strong>Repeat</strong> — You take a good action consistently</div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">2</div>
-            <div class="science-step-text"><strong>Anticipate</strong> — Your brain expects the positive outcome</div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">3</div>
-            <div class="science-step-text"><strong>Release</strong> — Dopamine fires more efficiently</div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">4</div>
-            <div class="science-step-text"><strong>Reinforce</strong> — The habit gets stronger. You repeat it.</div>
-          </div>
-        </div>
-        <div class="science-card-divider"></div>
-        <div class="science-card-bottom"><strong>More consistency = More dopamine = Stronger you.</strong></div>`,
+    const CARDS = {
+      early: [
+        makeCard("🌱 Starting the Loop", "The act of starting<br><span>is the whole practice.</span>",
+          [["Notice","Something good just happened — catch it before it fades"],["Capture","Write it down. Four words is enough"],["Save","Your brain just received a signal worth repeating"],["Return","Tomorrow you come back. The loop begins."]],
+          "Done is better than perfect."),
+        makeCard("⚡ How Small Wins Work", "Small wins<br><span>release real dopamine.</span>",
+          [["Act","You take one small step — any step"],["Register","Your brain marks it as a completed action"],["Release","Dopamine fires. Not because it was big. Because it was done."],["Repeat","The next step gets easier. That's the system."]],
+          "Consistency beats talent."),
+        makeCard("🧠 Your Brain Is Listening", "Every moment you capture<br><span>trains something real.</span>",
+          [["Notice","You pause and catch a good thing happening"],["Signal","Your brain receives: this is worth remembering"],["File","It moves from short-term to long-term memory"],["Build","Each capture makes the next one more natural."]],
+          "Trust your doing more than your feeling."),
+        makeCard("📝 One Moment Is Enough", "You don't need a great day.<br><span>You need one good moment.</span>",
+          [["Open","You opened the app. That's already the practice"],["Find","One thing — any thing — that was good"],["Save","You captured it before your brain discarded it"],["Win","You just beat the negativity bias. Today."]],
+          "Doing is more important than thinking."),
+        makeCard("🔄 The Loop Starts Here", "Action creates reward.<br><span>Reward creates action.</span>",
+          [["Do","You complete one small action — capture a moment"],["Mark","Your brain registers: I did something intentional"],["Release","Dopamine follows intentional action every time"],["Reinforce","The pattern gets stronger. You don't have to force it."]],
+          "Systems create progress."),
+        makeCard("✓ Done Beats Perfect", "The imperfect entry<br><span>is worth more than the perfect one you never wrote.</span>",
+          [["Start","You opened the app. Most people won't."],["Write","You typed something — rough, short, real"],["Save","It exists now. Your brain filed it."],["Proof","Tomorrow this becomes yesterday's evidence."]],
+          "Done is better than perfect."),
+        makeCard("👁 Noticing IS the Practice", "The practice isn't remembering.<br><span>It's learning to notice.</span>",
+          [["Slow down","Something good just happened near you"],["See it","Your brain almost let it go — but you caught it"],["Name it","Writing it makes it real. Four words minimum."],["Keep it","This moment is now permanent. The brain filed it."]],
+          "What you notice, you keep."),
+        makeCard("🌀 You Don't Need to Feel It", "You don't need motivation.<br><span>You need action.</span>",
+          [["Show up","Open the app even when nothing feels special"],["Look","There is always something good if you look honestly"],["Capture","Write it. The feeling comes after, not before."],["Build","The discipline of showing up creates the reward."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("📌 What Gets Captured Gets Kept", "Your brain discards good things<br><span>in under three seconds.</span>",
+          [["The moment","Something good happens — a smile, a win, a small joy"],["The gap","Three seconds pass. Your brain starts to let it go."],["The capture","You type it. You stop the discard."],["The result","This moment now belongs to your past. Permanently."]],
+          "Memory is a liability. Build systems."),
+        makeCard("🚀 Starting Small Is Still Starting", "The smallest entry<br><span>is infinitely bigger than nothing.</span>",
+          [["Permission","You don't need something big to capture — small counts"],["Attempt","Any honest good moment qualifies. Any."],["Record","You wrote it. That's the whole practice right there."],["Compound","Ten small entries become proof. Proof becomes identity."]],
+          "Repetition builds dopamine."),
+        makeCard("🎯 Your Brain Rewards the Attempt", "Dopamine fires for effort,<br><span>not just for results.</span>",
+          [["Effort","You opened the app. You looked for something good."],["Signal","Your brain receives: this person is trying"],["Reward","Dopamine releases for intentional effort — always"],["Reinforce","Tomorrow the effort gets slightly easier. Every time."]],
+          "Effort compounds over time."),
+        makeCard("🌿 Progress Is Invisible First", "You won't feel it working<br><span>until suddenly you do.</span>",
+          [["Day one","Nothing feels different. That's normal."],["Day three","Still nothing obvious. Keep going."],["Day seven","Something shifts. You notice you're looking for good things."],["Day fourteen","The shift is real. The practice created it quietly."]],
+          "Trust your doing more than your feeling."),
+        makeCard("⚙️ The Act Changes First", "The feeling follows the action.<br><span>Not the other way around.</span>",
+          [["Before","You don't feel like capturing anything today"],["During","You open the app and look anyway"],["After","You find something — always. The act creates the finding."],["Tomorrow","The feeling of wanting to capture comes from doing it."]],
+          "Doing is more important than thinking."),
+        makeCard("🔢 Consistency Starts With One", "Every streak<br><span>started as one entry.</span>",
+          [["One","The first capture. The hardest one."],["Two","You came back. The loop started."],["Three","You're building something the science calls a habit."],["Forward","One entry at a time is the only way it's ever done."]],
+          "Done is better than perfect."),
+        makeCard("💡 Your First Moment Counts Forever", "The first good moment you captured<br><span>is now part of your documented past.</span>",
+          [["Notice","You spotted something good in an ordinary moment"],["Capture","You wrote it before your brain discarded it"],["File","It transferred to long-term memory — permanently"],["Foundation","Every moment after this builds on this one."]],
+          "Your future is built on the past you create today."),
+        makeCard("🌱 You Are Training Something New", "A new reflex is forming.<br><span>You are teaching your brain to look for good.</span>",
+          [["Old reflex","Your brain scans automatically for threats and problems"],["New signal","Every capture tells your brain: good things matter too"],["Rewire","Neuroplasticity is real. The brain changes with use."],["Result","Over time, you notice good things before bad ones."]],
+          "Consistency beats talent."),
+        makeCard("📦 What You Notice, You Keep", "Uncaptured moments<br><span>are discarded forever.</span>",
+          [["The moment","A good thing happens. Your brain has three seconds."],["The discard","Without capture, it's gone. Negativity bias wins."],["The save","You capture it. You interrupt the discard."],["The gift","This moment is now yours. Tomorrow it becomes evidence."]],
+          "Memory is a liability. Build systems."),
+        makeCard("⏱ The Habit Forms Before You Feel It", "The practice is working<br><span>long before you believe it is.</span>",
+          [["Day one","You capture one moment. Nothing dramatic."],["Day five","You find yourself looking for good things. Instinctively."],["Day ten","You feel slightly different walking into your day."],["Day twenty","Someone asks why you seem different. You know why."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🔑 Doing Creates the Desire", "Motivation follows action.<br><span>It does not precede it.</span>",
+          [["The myth","Wait until you feel motivated to start"],["The truth","Motivation is created by starting — not the other way around"],["The practice","Open the app. Capture something. Feel it arrive."],["The system","DOPAmine is built on this truth."]],
+          "Doing is more important than thinking."),
+        makeCard("📅 Today's Entry Is Tomorrow's Evidence", "What you capture today<br><span>becomes yesterday's proof tomorrow.</span>",
+          [["Today","You notice something good. You save it."],["Tonight","It rests in your history — one entry in a growing archive"],["Tomorrow morning","Yesterday Was Good shows you what you built"],["The compound","Each day's entry makes the next day's evidence stronger."]],
+          "Your future is built on the past you create today."),
+        makeCard("🧩 Small Is Not Nothing", "The parking spot that made you smile.<br><span>The coffee that was exactly right. These count.</span>",
+          [["The lie","Only big things deserve to be called good moments"],["The truth","Small positive moments are where dopamine lives daily"],["The practice","Capture the small. Your brain doesn't distinguish by size."],["The result","A life full of noticed small things is a documented good life."]],
+          "Small wins build momentum."),
+        makeCard("🎁 Your Brain Rewards Every Notice", "Every time you spot something good<br><span>your brain says: do that again.</span>",
+          [["Spot","Something positive happens — you see it"],["Signal","Your brain receives: this person is noticing good things"],["Reward","Dopamine. Small. Real. Immediate."],["Loop","This is why the practice works. Every single time."]],
+          "Repetition builds dopamine."),
+        makeCard("🏗 Structure Drives Results", "DOPAmine is a structure.<br><span>Not a feeling. Not a motivation. A system.</span>",
+          [["Open","You show up to the app — that's step one of the structure"],["Capture","You look for and record one good moment"],["Return","You come back tomorrow — the structure continues"],["Results","Structure produces results that feelings never sustain."]],
+          "Systems create progress."),
+        makeCard("🌅 The Loop Begins With You", "The dopamine loop<br><span>only starts when you start it.</span>",
+          [["You act","You open the app. You find something good."],["You capture","You type it. Four words is enough."],["You save","Your brain receives the signal: done."],["You return","The loop is yours. It starts and ends with you."]],
+          "Doing is more important than thinking."),
+        makeCard("✨ Today Is Always Enough to Start", "You don't need more time,<br><span>more energy, or a better day.</span>",
+          [["Now","This moment — whatever it is — is where the practice lives"],["This entry","One capture today is worth one hundred planned tomorrows"],["This habit","It doesn't need perfect conditions. It just needs you."],["This evidence","Today's entry becomes tomorrow's proof that you showed up."]],
+          "Done is better than perfect."),
+      ],
 
-      evening: `
-        <div class="science-card-label">⚡ Consistent vs Inconsistent</div>
-        <div class="science-card-headline">Small moments.<br><span>Compounding forever.</span></div>
-        <div class="science-card-stats">
-          <div class="science-stat">
-            <div class="science-stat-num">📉</div>
-            <div class="science-stat-label">Inconsistent</div>
-            <div class="science-step-text" style="font-size:0.7rem;margin-top:4px;color:rgba(255,255,255,0.4)">Spikes then drops. Hard to build momentum.</div>
-          </div>
-          <div class="science-stat">
-            <div class="science-stat-num">📈</div>
-            <div class="science-stat-label">Consistent</div>
-            <div class="science-step-text" style="font-size:0.7rem;margin-top:4px;color:rgba(255,255,255,0.6)">Steady growth. Habits become automatic.</div>
-          </div>
-        </div>
-        <div class="science-card-divider"></div>
-        <div class="science-card-bottom">Every small, consistent action is a vote for <strong>the person you want to become.</strong></div>`,
+      mid: [
+        makeCard("📈 You're Starting to See It", "The pattern is real.<br><span>You put it there.</span>",
+          [["Early","You captured moments. Some days more than others."],["Pattern","Your Progress tab now shows purple dots where you showed up"],["Evidence","The dots are not decoration — they are proof of consistency"],["Compound","Each new dot makes the next one more natural to add."]],
+          "Consistency beats talent."),
+        makeCard("🔥 Momentum Is Real", "Momentum is invisible<br><span>until it becomes undeniable.</span>",
+          [["Before","The first week felt mechanical. Just going through motions."],["During","Something shifted. You started noticing before you opened the app."],["Now","You are looking for good things throughout your day."],["Forward","That instinct is momentum. You built it."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🧬 Your Brain Is Changing", "Neuroplasticity is not a metaphor.<br><span>It is what is happening right now.</span>",
+          [["Capture one","Your brain receives: this person notices good things"],["Capture ten","Neural pathways associated with positive noticing strengthen"],["Capture thirty","The pathway is established — noticing becomes easier"],["Capture one hundred","The new reflex is real. Your brain actually changed."]],
+          "Repetition builds dopamine."),
+        makeCard("⚡ Consistency Is Its Own Reward", "You don't chase the feeling anymore.<br><span>The practice creates it.</span>",
+          [["Early you","Needed to remind yourself to open the app"],["Mid you","Opens the app because something good just happened"],["Pattern","The motivation now follows the practice — not the other way around"],["Proof","This is exactly what building a habit looks like from the inside."]],
+          "Doing is more important than thinking."),
+        makeCard("📚 The Evidence Is Accumulating", "Every entry in your archive<br><span>is evidence against the false story.</span>",
+          [["The old story","Your brain had filed mostly bad days, problems, setbacks"],["The new archive","Your DOPAmine history tells a different, more accurate story"],["The accuracy","Both stories happened — but only one was documented"],["The truth","Your documented good moments are the accurate version of your life."]],
+          "Never use your past to plan your future."),
+        makeCard("🔄 You Are Not Who You Were on Day One", "Something has changed.<br><span>You put it there through repetition.</span>",
+          [["Day one you","Opened the app and felt slightly uncertain what qualified"],["Now","You capture instinctively — before the moment even fully lands"],["The difference","That instinct is a trained reflex. You trained it."],["The identity","You are becoming someone who notices good. Consistently."]],
+          "What you repeat, you become."),
+        makeCard("🪞 The Streak Is a Mirror", "Your streak doesn't just track days.<br><span>It reflects who you are becoming.</span>",
+          [["Each day","You chose to look for good when it would have been easy not to"],["The streak","Is a record of choices made — not just a number"],["The mirror","Look at it and see: this is someone who shows up"],["The identity","The streak is becoming your self-image. That matters."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🏗 You're Building the Past You Need", "Your future self<br><span>will stand on the past you are building right now.</span>",
+          [["Now","Each capture adds one more brick to your documented good past"],["Soon","You will have 30, 60, 90 days of evidence"],["Then","Your brain uses past evidence to build future expectations"],["Result","A documented good past creates the expectation of a good future."]],
+          "Your future is built on the past you create today."),
+        makeCard("🎯 Repetition Is Quietly Winning", "The work happening below the surface<br><span>is the most important work.</span>",
+          [["Visible","You see entries, dots, streaks — the surface evidence"],["Invisible","Below: neural pathways strengthening with each capture"],["Compound","Small changes daily become large changes over months"],["Trust","The invisible work is real. It shows up later."]],
+          "Effort compounds over time."),
+        makeCard("⚙️ The System Is Working", "You built a system.<br><span>Now the system is building you.</span>",
+          [["You designed","Open app. Capture moment. Save. Return."],["The system runs","Every day you execute it — the system reinforces itself"],["The output","A growing archive. A strengthening habit. A changing brain."],["The proof","You are reading this after days of using the system. It works."]],
+          "Systems create progress."),
+        makeCard("🌊 Momentum Compounds Quietly", "You may not feel the momentum.<br><span>It is building anyway.</span>",
+          [["Week one","Felt like effort. Was effort."],["Week two","Felt slightly more natural. Still required intention."],["Week three","Starting to feel automatic in moments. That is momentum."],["Week four","The instinct to notice is arriving before the thought to open the app."]],
+          "Consistency beats talent."),
+        makeCard("💪 You're Proving Something to Yourself", "Every day you return<br><span>you write a sentence in a story about who you are.</span>",
+          [["The sentence","I showed up today when I could have skipped"],["The paragraph","I showed up this week when life made it inconvenient"],["The chapter","I showed up this month and built a documented good past"],["The story","I am someone who shows up. The proof is in the entries."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🔑 The Habit Is Forming", "Habits don't ask permission.<br><span>They form through repetition. You are in the middle of one forming.</span>",
+          [["Cue","Something good happens — you reach for the app"],["Routine","Open. Type. Save. Under ten seconds."],["Reward","The entry exists. Your brain received a signal."],["Automatic","After enough repetitions, the cue triggers the routine without thinking."]],
+          "Doing is more important than thinking."),
+        makeCard("🌿 Discipline Is Becoming Automatic", "The first days required willpower.<br><span>These days are beginning to require less of it.</span>",
+          [["Willpower","Used heavily in early days to force the new behavior"],["Habit","Replaces willpower over time — the action becomes automatic"],["Where you are","Somewhere between willpower and automatic. Keep going."],["Where you're going","The practice running itself. Your discipline became a system."]],
+          "Discipline is doing consistent things to achieve your goals."),
+        makeCard("🎖 Your Streak Is Identity Forming", "A streak long enough<br><span>stops being a streak and starts being who you are.</span>",
+          [["Early","The streak was a goal to protect"],["Now","The streak is a reflection of a habit in progress"],["Soon","The streak is an identity marker — this is what I do"],["Ahead","The streak is no longer something you have. It's something you are."]],
+          "What you repeat, you become."),
+        makeCard("📊 The Results Are in the Repetition", "There is no trick.<br><span>The repetition is the result.</span>",
+          [["The insight","Most people look for results and miss the process creating them"],["The truth","The daily capture IS the result — not what leads to it"],["The evidence","Look at your Progress tab. Those dots are results."],["The shift","Stop waiting for results. You are living inside them right now."]],
+          "Repetition builds dopamine."),
+        makeCard("🔮 Your Future Self Is Watching", "The person you are becoming<br><span>is built by the person you are being right now.</span>",
+          [["Now","You open the app. You capture something real."],["Building","Each entry adds evidence to the story of who you are"],["Future","Your future self will have this archive to stand on"],["Gift","Today's capture is a gift from you to the person you're becoming."]],
+          "Your future is built on the past you create today."),
+        makeCard("🌟 Trust the Process You Started", "You started something real.<br><span>Now trust it enough to continue.</span>",
+          [["You chose","To notice good things and capture them daily"],["The days","Some felt meaningful. Some felt ordinary. All count."],["The pattern","Ordinary days captured consistently create extraordinary evidence"],["The trust","The process works. You are the proof it works."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🏆 Patterns Don't Lie", "The pattern in your archive<br><span>is more honest than your worst day felt.</span>",
+          [["Bad day","Felt like everything was hard and nothing was good"],["The archive","Shows 4 good moments from that same day you captured"],["The truth","The bad day was real AND the 4 good moments were real"],["The lesson","Your feelings curate your memory. Your archive does not."]],
+          "Never use your past to plan your future."),
+        makeCard("🧠 Your Consistency Is Speaking", "Your streak is not silent.<br><span>It is saying something specific about who you are.</span>",
+          [["What it says","This person shows up even when they don't have to"],["What it proves","Discipline is not reserved for other people — it lives here too"],["What it builds","Confidence that transfers to other areas of life"],["What it means","You are not the person who quits. The archive proves it."]],
+          "Feel good about the streak you are leading."),
+        makeCard("⚡ The Compound Effect Is Real", "Small actions repeated<br><span>create results that look miraculous from the outside.</span>",
+          [["One entry","Worth almost nothing in isolation"],["Ten entries","Worth slightly more — a pattern begins"],["Thirty entries","Worth significantly more — a habit is forming"],["One hundred entries","Worth everything — you are not the same person who started."]],
+          "Effort compounds over time."),
+        makeCard("🌱 You're Building a Better Past", "Every capture today<br><span>improves the past you carry into tomorrow.</span>",
+          [["The problem","Most people carry a past curated by negativity bias"],["The fix","Every capture adds accurate positive evidence to your history"],["The result","Your remembered past becomes more accurate — and more good"],["The future","A better past creates better future expectations. Automatically."]],
+          "Memory is a liability. Build systems."),
+        makeCard("🎯 The Work You Don't See Is Happening", "The most important changes<br><span>are invisible while they're happening.</span>",
+          [["Invisible","Neural pathways strengthening with each capture"],["Invisible","The negativity bias weakening with each positive file"],["Invisible","Your brain's default scan beginning to include positive events"],["Visible soon","You'll notice you feel slightly different. That's the invisible work arriving."]],
+          "Consistency beats talent."),
+        makeCard("🔄 What You Repeat, You Become", "Behavior repeated<br><span>becomes identity over time. Always.</span>",
+          [["Repeat once","An action"],["Repeat ten times","A choice"],["Repeat thirty times","A habit"],["Repeat one hundred times","Part of who you are. This is the science. This is what's happening."]],
+          "What you repeat, you become."),
+        makeCard("💎 The Streak Is Worth Protecting", "Your streak is not a number.<br><span>It's a record of a person who showed up.</span>",
+          [["Each day","A decision made when skipping was possible"],["The streak","Documents every one of those decisions in sequence"],["Its value","Not in the number — in what the number represents"],["Protect it","Not out of obsession. Out of respect for the person creating it."]],
+          "Trust your consistency more than your feelings."),
+      ],
 
-      night: `
-        <div class="science-card-label">🌙 What You Built Today</div>
-        <div class="science-card-headline">Today becomes<br><span>your yesterday.</span></div>
-        <div class="science-card-steps">
-          <div class="science-card-step">
-            <div class="science-step-icon">📝</div>
-            <div class="science-step-text">You noticed the good. Your brain <strong>filed it permanently.</strong></div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">💪</div>
-            <div class="science-step-text">Stronger neural pathways. <strong>Habits becoming automatic.</strong></div>
-          </div>
-          <div class="science-card-step">
-            <div class="science-step-icon">⭐</div>
-            <div class="science-step-text">Tomorrow you wake up with a <strong>better past than yesterday.</strong></div>
-          </div>
-        </div>
-        <div class="science-card-divider"></div>
-        <div class="science-card-bottom"><strong>Consistency today. Dopamine tomorrow. A better you forever.</strong></div>`,
+      advanced: [
+        makeCard("👑 You Are Someone Who Does This", "The identity is no longer forming.<br><span>It has formed.</span>",
+          [["Before","You were someone trying to build a habit"],["Now","You are someone who has a habit — documented, proven, real"],["The shift","Identity doesn't announce itself. It arrives quietly through repetition"],["You arrived","Look at your archive. That person in there is you. Consistently."]],
+          "What you repeat, you become."),
+        makeCard("⚙️ The System Belongs to You", "You don't follow the system anymore.<br><span>You are the system.</span>",
+          [["Built","You created a daily practice through repetition"],["Owned","The practice now runs with minimal effort"],["Automatic","The reflex to notice good things precedes the thought to capture them"],["Yours","This system is yours. It cannot be taken. It lives in your wiring."]],
+          "Systems create progress."),
+        makeCard("⚡ You Generate Your Own Dopamine", "You don't need external sources<br><span>to feel good about your life.</span>",
+          [["The old way","Waiting for good things to happen to you and hoping to feel them"],["The new way","Actively noticing good things and capturing them as they happen"],["The result","A consistent, internally generated source of positive signal"],["The freedom","You are no longer dependent on outside events to feel good."]],
+          "People optimize for the wrong things when they seek dopamine from the outside."),
+        makeCard("🪞 Identity Confirmed", "The archive confirms<br><span>what the practice created.</span>",
+          [["The question","Who am I? What kind of person am I really?"],["The evidence","Your archive answers this with data, not feelings"],["The answer","Someone who notices good things and captures them. Consistently."],["The confidence","This identity is documented. It cannot be argued with."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🔋 You Don't Need Motivation Anymore", "Motivation is fuel for people<br><span>who haven't built systems yet.</span>",
+          [["Before systems","Needed motivation to act — and motivation is unreliable"],["With systems","The system runs regardless of how motivated you feel"],["Your system","Open. Notice. Capture. Save. It runs on discipline, not feeling."],["The gift","You have something more reliable than motivation. You have a system."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🏆 The Discipline Is Yours", "You built discipline<br><span>the only way it can be built: through repetition.</span>",
+          [["You showed up","On the days it was easy and on the days it wasn't"],["You captured","Moments that felt significant and moments that felt ordinary"],["You returned","The next day, and the day after, without being asked"],["You own it","This discipline is not borrowed. It was built by you."]],
+          "Discipline is doing consistent things to achieve your goals."),
+        makeCard("🏗 You Built This From Nothing", "There was no archive.<br><span>There was no habit. There was no streak. You built all of it.</span>",
+          [["Day one","A blank slate. An idea. A first capture."],["The days after","Repetition. Some days inspired. Some days mechanical. All counted."],["Now","An archive. A streak. A trained brain. A changed identity."],["The truth","Everything in your Progress tab was made by you, from nothing."]],
+          "Done is better than perfect."),
+        makeCard("📚 Your Past Is Now an Asset", "For most people, the past is a burden.<br><span>For you, it has become evidence.</span>",
+          [["The old past","A curated collection of setbacks remembered by a negativity-biased brain"],["The new archive","A documented record of good moments, accurately preserved"],["The shift","You now have a past that tells an accurate, positive story"],["The power","A good documented past creates the expectation of a good future."]],
+          "Never use your past to plan your future."),
+        makeCard("💪 Consistency Is Your Superpower", "Talent runs out.<br><span>Consistency compounds.</span>",
+          [["The gifted person","Has talent but no system — produces in bursts, disappears"],["You","Have built a consistent system — produces steadily, compounds daily"],["The math","Consistency over time outperforms talent without consistency every time"],["The proof","Your archive is the mathematical proof. The dots don't lie."]],
+          "Consistency beats talent."),
+        makeCard("🧩 The Four Dimensions of You", "You've been building in one dimension.<br><span>There are three more waiting.</span>",
+          [["Mindset","Your daily captures are already strengthening your mindset pillar"],["Body","Moments tagged with movement and energy — your body pillar is active"],["Emotions","Connection, gratitude, calm — your emotions pillar has evidence"],["Goals","The consistency you've built here? It transfers to every goal you set."]],
+          "DOPAmine is a curated path to a better you."),
+        makeCard("🌟 What Consistency Made Possible", "This archive did not exist<br><span>before you built the habit of filling it.</span>",
+          [["You created","A daily practice of noticing good things"],["You built","An archive of evidence that your life contains real good"],["You trained","Your brain to notice positive moments before they evaporate"],["You proved","That consistency is more powerful than any single moment of inspiration."]],
+          "Effort compounds over time."),
+        makeCard("✅ You've Proven the Concept", "The concept was:<br><span>consistency in noticing good things changes how you feel about your life.</span>",
+          [["The claim","Capturing daily good moments trains your brain toward positivity"],["The test","You ran it. For days. For weeks. Consistently."],["The result","Look at how you walk into your day now vs. day one"],["The proof","You are the proof of concept. The archive is the evidence."]],
+          "Trust your doing more than your feeling."),
+        makeCard("🚪 The Next Level Is Waiting", "You've proven you can build a habit.<br><span>The question now is: what do you build next?</span>",
+          [["Layer one","Capture good moments. Build the daily practice. You did it."],["Layer two","Apply the same consistency to Mindset, Body, Emotions, and Goals"],["The bridge","Your daily captures are already pointing to which pillars need attention"],["The invitation","DOPAmine+ is the organized toolkit for what comes next."]],
+          "DOPAmine is a curated path to a better you."),
+        makeCard("🤖 You Are the System Now", "The system no longer needs you to push it.<br><span>You are it.</span>",
+          [["Early","You pushed the system — discipline required to maintain it"],["Mid","The system and you were equals — habit forming, effort decreasing"],["Now","The system runs through you — noticing is automatic, capturing is reflex"],["Identity","You don't have a habit of capturing good moments. You are someone who does."]],
+          "Systems create progress."),
+        makeCard("🌍 Your Environment Reflects Your Choices", "You shaped your environment<br><span>by committing to a daily practice.</span>",
+          [["Before","Your environment was default — shaped by external forces"],["The practice","You introduced a daily intentional structure into your life"],["The signal","This practice tells every other part of your life who is in charge"],["The result","Intentional environments produce intentional outcomes."]],
+          "Watch your environment and make choices aligned with your true needs."),
+        makeCard("⏳ The Habit Owns the Future", "Habits projected forward<br><span>become destiny.</span>",
+          [["Project forward","Your daily practice, maintained for one more year"],["The archive","Over 365 documented good days — a life accurately recorded"],["The identity","Someone whose baseline is noticing good. For whom bad days are the exception."],["The future","The habit you built owns your trajectory. That's not metaphor. It's math."]],
+          "Your future is built on the past you create today."),
+        makeCard("🦋 From Doing to Being", "You started by doing the practice.<br><span>You are now being the person the practice creates.</span>",
+          [["Doing stage","Opening the app required intention. Capturing required effort."],["Transition","The intention disappeared. The effort decreased. The habit arrived."],["Being stage","You notice good things and reach for the app simultaneously. No gap."],["The arrival","This is what identity change feels like from the inside."]],
+          "What you repeat, you become."),
+        makeCard("🏅 Trust Became Proof", "You were asked to trust the process<br><span>before you had proof. Now you have proof.</span>",
+          [["The ask","Trust that capturing daily good moments would change something real"],["The uncertainty","Early days with no evidence — just the process running"],["The arrival","Something shifted. Weeks in. Quietly. Undeniably."],["The proof","Your archive. Your streak. Your changed reflex. That's what trust built."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🎯 What You Started Became Who You Are", "The decision you made<br><span>to start this practice was a decision about identity.</span>",
+          [["The decision","I will capture good moments daily"],["The practice","You executed it. Imperfectly. Consistently."],["The accumulation","Days became weeks. Entries became patterns. Patterns became proof."],["The identity","You are now someone who does this. The archive confirms it."]],
+          "Done is better than perfect."),
+        makeCard("📢 The Results Speak", "Look at your archive.<br><span>That is your result.</span>",
+          [["The entries","Every good moment captured before your brain discarded it"],["The streak","Every day you showed up when you could have skipped"],["The dots","Thirty days of purple on your calendar — effort made visible"],["The result","You don't need to feel the result. It's documented. It speaks."]],
+          "Doing is more important than thinking."),
+        makeCard("🔓 Discipline Found Its Reward", "The reward for discipline<br><span>is not what discipline produces. It is who discipline makes you.</span>",
+          [["You chose","To show up consistently when feeling chose otherwise"],["You built","A practice that now runs partly on its own momentum"],["You became","Someone for whom discipline in one area transfers to others"],["The reward","The confidence of being someone who does what they say they'll do."]],
+          "Discipline is doing consistent things to achieve your goals."),
+        makeCard("⚡ You Optimized From Within", "Everyone else is chasing dopamine<br><span>from external sources. You built your own.</span>",
+          [["External dopamine","Social media. Validation. Purchases. Always requiring more input."],["Internal dopamine","Built through consistent intentional action. Self-sustaining."],["Your system","Generates reward from within — through noticing, capturing, proving consistency"],["The difference","You are not dependent on outside events to feel good about your life."]],
+          "People optimize for the wrong things when they seek dopamine from the outside."),
+        makeCard("🗺 The Path Ahead Is Clearer", "The person you were on day one<br><span>could not see what you can see now.</span>",
+          [["Day one view","Uncertain. The practice unproven. The outcome unknown."],["Now view","The practice proven. The archive real. The identity shifted."],["What's clear","Consistency works. You are evidence. The path continues forward."],["What's next","Four pillars. A deeper toolkit. The same discipline applied more broadly."]],
+          "DOPAmine is a curated path to a better you."),
+        makeCard("🔧 Systems Over Feelings", "Feelings are weather.<br><span>Systems are architecture.</span>",
+          [["Feelings","Change daily. Unreliable as a foundation for behavior."],["Systems","Consistent. Reliable. Produce results regardless of how you feel."],["Your system","Runs even on days when motivation is absent and feelings are difficult"],["The lesson","You built something that weather cannot destroy. That's architecture."]],
+          "Trust your consistency more than your feelings."),
+        makeCard("🎖 You Earned This", "This archive.<br><span>This streak. This changed brain. This identity. You earned all of it.</span>",
+          [["Not given","No algorithm gave this to you. No shortcut created it."],["Earned","Through daily repetition — small, honest, consistent effort"],["Real","The change in how you notice and feel about your life is real"],["Yours","Every dot on your calendar. Every entry in your archive. Earned."]],
+          "Consistency beats talent."),
+        makeCard("🌅 Make This the Most Interesting Part of Your Day", "Your job can be uninspiring.<br><span>Your DOPAmine practice never has to be.</span>",
+          [["The ordinary","Work, commute, routine — often uninspiring by design"],["The practice","DOPAmine asks: what was good today? Even in ordinary?"],["The discovery","There is always something. The parking spot. The conversation. The coffee."],["The result","Engineer this to be the part of your day you actually look forward to."]],
+          "Engineer this to be something you enjoy doing."),
+      ]
     };
+
+    function getStage() {
+      const moments = loadMoments();
+      const streak = calcStreak(moments);
+      const total = moments.length;
+      if (streak >= 30 || total >= 100) return 'advanced';
+      if (streak >= 7  || total >= 30)  return 'mid';
+      return 'early';
+    }
+
+    function getCardIndex() {
+      // Rotate based on date so it changes daily
+      const d = new Date();
+      return (d.getFullYear() * 366 + d.getMonth() * 31 + d.getDate());
+    }
 
     const HINT = `<div class="science-card-hint">Tap to read more ↗</div>`;
 
     function showScienceQuote() {
-      const hour = new Date().getHours();
-      let card;
-      if (hour >= 5  && hour < 12) card = SCIENCE_CARDS.morning;
-      else if (hour >= 12 && hour < 18) card = SCIENCE_CARDS.afternoon;
-      else if (hour >= 18 && hour < 23) card = SCIENCE_CARDS.evening;
-      else card = SCIENCE_CARDS.night;
+      const stage = getStage();
+      const pool = CARDS[stage];
+      const idx = getCardIndex() % pool.length;
+      const card = pool[idx];
 
       const el = document.getElementById('scienceQuote');
       el.innerHTML = card + HINT;
