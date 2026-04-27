@@ -582,22 +582,79 @@
       padding: 28px 24px 48px;
       width: 100%;
       max-width: 480px;
-      max-height: 85vh;
+      max-height: 90vh;
       overflow-y: auto;
       animation: slideUp 0.3s ease;
     }
 
     .science-modal-close {
       text-align: right;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .science-modal-close button {
       background: none;
       border: none;
       color: rgba(255,255,255,0.4);
-      font-size: 1.2rem;
+      font-size: 1.4rem;
       cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    /* Large text overrides inside the modal */
+    #scienceModalContent .science-card-label {
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+
+    #scienceModalContent .science-card-headline {
+      font-size: 1.6rem;
+      line-height: 1.25;
+      margin-bottom: 20px;
+    }
+
+    #scienceModalContent .science-card-steps {
+      gap: 16px;
+    }
+
+    #scienceModalContent .science-step-icon {
+      width: 38px;
+      height: 38px;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    #scienceModalContent .science-step-text {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    #scienceModalContent .science-card-divider {
+      margin: 20px 0;
+    }
+
+    #scienceModalContent .science-card-bottom {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    #scienceModalContent .science-card-stats {
+      gap: 12px;
+    }
+
+    #scienceModalContent .science-stat {
+      padding: 16px 12px;
+      border-radius: 14px;
+    }
+
+    #scienceModalContent .science-stat-num {
+      font-size: 1.6rem;
+    }
+
+    #scienceModalContent .science-stat-label {
+      font-size: 0.8rem;
+      margin-top: 6px;
     }
 
     .science-card::before {
