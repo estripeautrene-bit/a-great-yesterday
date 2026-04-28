@@ -12,6 +12,15 @@
   <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
   <link rel="manifest" href="manifest.json" />
   <title>DOPAmine</title>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KBD1H2JJTR"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-KBD1H2JJTR');
+  </script>
   <style>
     * {
       box-sizing: border-box;
@@ -2199,6 +2208,9 @@
         id="momentInput"
         placeholder="I just ....."
         maxlength="280"
+        spellcheck="true"
+        autocorrect="on"
+        autocapitalize="sentences"
         oninput="updateCharCount()"
       ></textarea>
 
@@ -3495,6 +3507,7 @@
           <div class="feel-label">How does yesterday make you feel today?</div>
           <textarea class="feel-textarea" id="feelInput"
             placeholder="Write how you feel after seeing yesterday's good moments..."
+            spellcheck="true" autocorrect="on" autocapitalize="sentences"
             ${savedFeeling ? 'disabled' : ''}>${savedFeeling || ''}</textarea>
           ${savedFeeling
             ? `<div id="feelSaved" style="text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Saved ✓</div>`
