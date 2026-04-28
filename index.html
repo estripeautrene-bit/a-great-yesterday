@@ -469,11 +469,15 @@
       padding: 20px;
       margin-bottom: 20px;
       text-align: center;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      user-select: none;
     }
 
     .prompt-card .emoji {
       font-size: 2rem;
       margin-bottom: 8px;
+      transition: opacity 0.3s;
     }
 
     .prompt-card p {
@@ -482,7 +486,31 @@
       color: white;
       letter-spacing: 1px;
       text-transform: uppercase;
+      transition: opacity 0.3s;
     }
+
+    .prompt-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .prompt-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      transition: background 0.3s;
+    }
+
+    .prompt-dot.active {
+      background: rgba(255,255,255,0.8);
+    }
+
+    body.light-mode .prompt-card p { color: #3D1580 !important; }
+    body.light-mode .prompt-dot { background: rgba(0,0,0,0.2) !important; }
+    body.light-mode .prompt-dot.active { background: #7B2FBE !important; }
 
     .input-area {
       background: rgba(255,255,255,0.06);
@@ -1159,6 +1187,27 @@
 
     /* ── Shareable progress card ── */
     .share-section { margin-top: 24px; }
+
+    .share-btn-top {
+      width: 100%;
+      background: linear-gradient(135deg, #7B2FBE, #B57BF7);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 16px 24px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 16px 0;
+      letter-spacing: 0.3px;
+      box-shadow: 0 6px 24px rgba(123,47,190,0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .share-btn-top:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 12px rgba(123,47,190,0.3);
+    }
 
     .share-card {
       background: linear-gradient(135deg, #1A1A2E 0%, #2D1B69 100%);
@@ -2134,9 +2183,10 @@
 
   <!-- LOG VIEW -->
   <div class="view active" id="view-log">
-    <div class="prompt-card">
-      <div class="emoji">✨</div>
-      <p>ONLY GOOD THINGS</p>
+    <div class="prompt-card" id="promptCard" onclick="nextPrompt()">
+      <div class="emoji" id="promptEmoji">✨</div>
+      <p id="promptText">ONLY GOOD THINGS</p>
+      <div class="prompt-dots" id="promptDots"></div>
     </div>
 
     <div class="log-streak" id="logStreak">
@@ -2202,6 +2252,7 @@
       <div id="yesterdaySubtitle" class="yesterday-subtitle"></div>
     </div>
     <div id="yesterdayWisdom"></div>
+    <div id="yesterdayQuestion"></div>
     <div class="yesterday-list" id="yesterdayList"></div>
     <div id="yesterdayFeel"></div>
     <button class="yesterday-start-btn" onclick="switchTab('log')">Start Today →</button>
@@ -2430,7 +2481,57 @@
       showToast("We'll let you know when DOPAmine+ is ready. 💜");
     }
 
-    // ── Theme toggle ─────────────────────────────────────────
+    // ── Prompt card carousel ─────────────────────────────────
+    const PROMPTS = [
+      { emoji: '✨', text: 'ONLY GOOD THINGS' },
+      { emoji: '🏆', text: 'SMALL WINS ADD UP' },
+      { emoji: '🌟', text: 'MY DAILY WINS' },
+      { emoji: '💫', text: 'ONE GOOD THING. RIGHT NOW.' },
+      { emoji: '🎯', text: 'MICRO WINS. EVERY DAY.' },
+    ];
+
+    let promptIdx = 0;
+    let promptTimer = null;
+
+    function renderPromptDots() {
+      const dots = document.getElementById('promptDots');
+      dots.innerHTML = PROMPTS.map((_, i) =>
+        `<div class="prompt-dot ${i === promptIdx ? 'active' : ''}"></div>`
+      ).join('');
+    }
+
+    function showPrompt(idx, animate = true) {
+      promptIdx = (idx + PROMPTS.length) % PROMPTS.length;
+      const emoji = document.getElementById('promptEmoji');
+      const text = document.getElementById('promptText');
+      if (animate) {
+        emoji.style.opacity = '0';
+        text.style.opacity = '0';
+        setTimeout(() => {
+          emoji.textContent = PROMPTS[promptIdx].emoji;
+          text.textContent = PROMPTS[promptIdx].text;
+          emoji.style.opacity = '1';
+          text.style.opacity = '1';
+        }, 200);
+      } else {
+        emoji.textContent = PROMPTS[promptIdx].emoji;
+        text.textContent = PROMPTS[promptIdx].text;
+      }
+      renderPromptDots();
+    }
+
+    function nextPrompt() {
+      showPrompt(promptIdx + 1);
+      resetPromptTimer();
+    }
+
+    function resetPromptTimer() {
+      if (promptTimer) clearInterval(promptTimer);
+      promptTimer = setInterval(() => showPrompt(promptIdx + 1), 4000);
+    }
+
+    showPrompt(0, false);
+    resetPromptTimer();
     const THEME_KEY = 'dopamine_theme';
 
     function toggleTheme() {
@@ -3333,11 +3434,13 @@
       const subtitle = document.getElementById('yesterdaySubtitle');
       const list = document.getElementById('yesterdayList');
       const wisdom = document.getElementById('yesterdayWisdom');
+      const questionEl = document.getElementById('yesterdayQuestion');
       const feel = document.getElementById('yesterdayFeel');
 
       if (moments.length === 0) {
         subtitle.innerHTML = '';
         wisdom.innerHTML = '';
+        if (questionEl) questionEl.innerHTML = '';
         feel.innerHTML = '';
         list.innerHTML = `<p class="yesterday-empty">Yesterday is a blank page.<br>Today doesn't have to be.</p>`;
         return;
@@ -3354,6 +3457,24 @@
           <div class="wisdom-seed-text">${seed}</div>
         </div>`;
 
+      // ── Reflection question (between philosophy and entries) ──
+      if (questionEl) {
+        const { question: q } = getReflectionQuestion(moments);
+        const savedReflection = localStorage.getItem(REFLECT_Q_KEY + yKey);
+        questionEl.innerHTML = `
+          <div class="feel-section" style="margin-bottom:16px;">
+            <div class="feel-label">${q}</div>
+            <textarea class="feel-textarea" id="reflectInput"
+              placeholder="Take a moment to reflect..."
+              ${savedReflection ? 'disabled' : ''}>${savedReflection || ''}</textarea>
+            ${savedReflection
+              ? `<div id="reflectSaved" style="text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
+              : `<button class="feel-save-btn" id="reflectSaveBtn" onclick="saveReflection()">Save my reflection</button>
+                 <div id="reflectSaved" style="display:none;text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
+            }
+          </div>`;
+      }
+
       // ── Entries ──
       list.innerHTML = moments.map(m => `
         <div class="yesterday-card">
@@ -3367,7 +3488,7 @@
         </div>
       `).join('');
 
-      // ── How do you feel ──
+      // ── How do you feel (bottom) ──
       const savedFeeling = localStorage.getItem(FEEL_KEY + yKey);
       feel.innerHTML = `
         <div class="feel-section">
@@ -3418,6 +3539,11 @@
           ${streak > 0 ? `<div class="progress-streak-meaning">${meaning}</div>` : ''}
         </div>
 
+        <!-- Share button — prominent at top -->
+        <button class="share-btn-top" onclick="shareProgress()">
+          🚀 Share My Progress
+        </button>
+
         <!-- Quick stats -->
         <div class="quick-stats">
           <div class="quick-stat clickable" onclick="showDayDetail('${todayKey()}', new Date())">
@@ -3446,7 +3572,7 @@
         <!-- Motivator -->
         <div class="progress-motivator" id="progressMotivator"></div>
 
-        <!-- Shareable card -->
+        <!-- Shareable card at bottom -->
         <div class="share-section">
           <div class="share-card" id="shareCard">
             <div class="share-card-logo">DOPA<span>mine</span></div>
@@ -3464,8 +3590,7 @@
             </div>
             <div class="share-card-tagline">Your tomorrow is being written right now.</div>
           </div>
-          <button class="share-btn" onclick="shareProgress()">📤 Share my progress</button>
-          <div class="share-hint">Screenshot and share on WhatsApp or Instagram</div>
+          <div class="share-hint">📸 Screenshot the card above and share it on WhatsApp or Instagram</div>
         </div>
       `;
 
