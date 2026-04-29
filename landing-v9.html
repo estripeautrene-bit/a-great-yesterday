@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DOPAmine — Write your wins. Get happier every day.</title>
+  <meta name="description" content="Capture every small win as it happens. They compound into real, lasting happiness." />
+  <meta name="theme-color" content="#0E0B1A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #0E0B1A;
+      --purple: #7B2FBE;
+      --violet: #9B4FDE;
+      --glow:   #B57BF7;
+      --white:  #ffffff;
+      --soft:   rgba(255,255,255,0.55);
+      --softer: rgba(255,255,255,0.25);
+    }
+
+    html { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg); color: var(--white);
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      padding: 20px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-family: 'DM Sans', sans-serif; font-weight: 500;
+      font-size: 0.95rem; color: var(--white); text-decoration: none;
+    }
+    .logo strong { color: var(--glow); }
+    .nav-link {
+      font-size: 0.82rem; font-weight: 300; color: var(--soft);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--white); }
+
+    /* ══════════════════════════════════
+       HERO — unchanged from v8
+    ══════════════════════════════════ */
+    .hero {
+      min-height: calc(100svh - 62px);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 24px 56px; text-align: center;
+    }
+
+    .title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(2.2rem, 8.5vw, 4rem);
+      line-height: 1.1; letter-spacing: -0.02em;
+      margin-bottom: 14px; max-width: 580px;
+    }
+    /* ACTION — what the user does: regular weight, softer white */
+    .t-action {
+      display: block;
+      font-weight: 400; font-style: normal;
+      color: rgba(255,255,255,0.7);
+    }
+    /* REACTION — what they get back: bold, italic, glowing */
+    .t-reaction {
+      display: block;
+      font-weight: 700; font-style: italic;
+      color: var(--glow);
+      margin-top: 6px;
+    }
+
+    .subtitle {
+      font-size: clamp(0.9rem, 2.8vw, 1rem);
+      font-weight: 300; color: var(--soft);
+      line-height: 1.65; max-width: 320px;
+      margin-bottom: 36px;
+    }
+
+    /* White input box */
+    .capture-box {
+      width: 100%; max-width: 540px;
+      background: #ffffff; border-radius: 20px;
+      padding: 22px 22px 18px; text-align: left;
+      box-shadow: 0 12px 60px rgba(0,0,0,0.5), 0 0 40px rgba(123,47,190,0.15);
+      cursor: text;
+    }
+
+    .capture-label {
+      font-size: 0.62rem; font-weight: 500;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--purple); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .capture-label::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--purple);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .capture-input {
+      width: 100%; background: none; border: none; outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(1rem, 3.5vw, 1.15rem);
+      font-weight: 400; color: #1a0f30;
+      line-height: 1.6; resize: none; min-height: 68px;
+      caret-color: var(--purple);
+    }
+    .capture-input::placeholder { color: rgba(0,0,0,0.25); }
+
+    .capture-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 16px; padding-top: 14px;
+      border-top: 1px solid rgba(0,0,0,0.07);
+    }
+
+    .photo-btn {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 0.78rem; font-weight: 400; color: rgba(0,0,0,0.38);
+      background: none; border: none; cursor: pointer;
+      padding: 0; transition: color 0.2s;
+    }
+    .photo-btn:hover { color: var(--purple); }
+    .photo-btn svg { width: 17px; height: 17px; }
+
+    .save-btn {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--purple); color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 500;
+      padding: 10px 22px; border-radius: 100px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .save-btn:hover { background: var(--violet); transform: translateY(-1px); }
+
+    /* Pills */
+    .examples {
+      display: flex; flex-wrap: wrap; justify-content: center;
+      gap: 8px; margin-top: 16px;
+      max-width: 540px; width: 100%;
+    }
+    .examples-label {
+      width: 100%; text-align: center;
+      font-size: 0.67rem; color: var(--softer);
+      font-weight: 300; margin-bottom: 2px;
+    }
+    .pill {
+      font-size: 0.77rem; font-weight: 300; color: var(--soft);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 100px; padding: 7px 14px; cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .pill:hover {
+      background: rgba(181,123,247,0.12);
+      border-color: rgba(181,123,247,0.35);
+      color: var(--white);
+    }
+
+    /* ══════════════════════════════════
+       BELOW FOLD — institutional
+    ══════════════════════════════════ */
+
+    .wrap {
+      max-width: 580px; margin: 0 auto;
+      padding: 72px 28px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .sec-h {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 6vw, 2.4rem);
+      font-weight: 700; line-height: 1.12;
+      letter-spacing: -0.02em; margin-bottom: 28px;
+    }
+    .sec-h em { font-style: italic; font-weight: 400; color: var(--glow); }
+
+    .prose {
+      font-size: 0.93rem; font-weight: 300;
+      color: var(--soft); line-height: 1.78;
+    }
+    .prose p { margin-bottom: 16px; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose strong { color: var(--white); font-weight: 400; }
+
+    /* ─── COMPOUND BAR CHART ─── */
+    .chart-wrap {
+      margin-top: 40px; padding-top: 28px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .chart-label {
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--softer); margin-bottom: 16px;
+    }
+    .bars {
+      display: flex; align-items: flex-end;
+      gap: 6px; height: 88px;
+    }
+    .bar-col {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px; flex: 1;
+    }
+    .bar {
+      width: 100%; border-radius: 3px 3px 0 0;
+      background: rgba(181,123,247,0.2);
+    }
+    .bar.lit { background: var(--glow); }
+    .bar-d {
+      font-size: 0.52rem; color: var(--softer); font-weight: 300;
+    }
+    .chart-caption {
+      font-size: 0.78rem; font-weight: 300;
+      color: var(--soft); margin-top: 16px; font-style: italic;
+    }
+    .chart-caption strong {
+      font-style: normal; font-weight: 500; color: var(--white);
+    }
+
+    /* ─── DOPAMINE LOOP ─── */
+    .loop-outer {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 28px;
+      margin: 8px 0 32px; width: 100%;
+    }
+    .loop-svg { width: min(360px, 92vw); }
+
+    .loop-labels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 32px;
+      width: 100%; max-width: 520px;
+    }
+    .ll-name {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      font-style: italic;
+      color: var(--glow); margin-bottom: 7px;
+    }
+    .ll-desc {
+      font-size: 0.88rem; font-weight: 300;
+      color: var(--soft); line-height: 1.6;
+    }
+
+    .orbit-arm   { animation: spin 7s linear infinite; transform-origin: 150px 150px; }
+    .orbit-trail { animation: spin 7s linear -0.55s infinite; transform-origin: 150px 150px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .node-ring { animation: nodePulse 3s ease-in-out infinite; }
+    .n1 .node-ring { animation-delay: 0s; }
+    .n2 .node-ring { animation-delay: 1.75s; }
+    .n3 .node-ring { animation-delay: 3.5s; }
+    .n4 .node-ring { animation-delay: 5.25s; }
+    @keyframes nodePulse { 0%,100%{opacity:0.25} 50%{opacity:0.7} }
+
+    /* ─── HOW IT WORKS ─── */
+    .step { display: flex; gap: 18px; margin-bottom: 26px; }
+    .step-n {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem; font-weight: 700;
+      color: rgba(181,123,247,0.35);
+      padding-top: 2px; width: 18px; flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 0.92rem; font-weight: 300;
+      color: var(--soft); line-height: 1.65;
+    }
+    .step-text strong { color: var(--white); font-weight: 400; }
+
+    /* ─── ANALOGIES ─── */
+    .analogy { margin-bottom: 32px; }
+    .analogy-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--white); margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .analogy-title em { font-style: italic; font-weight: 400; color: var(--glow); }
+    .analogy-body {
+      font-size: 0.9rem; font-weight: 300;
+      color: var(--soft); line-height: 1.72;
+    }
+    .analogy-body strong { color: var(--white); font-weight: 400; }
+    .analogy-rule {
+      width: 100%; height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 28px 0;
+    }
+
+    /* ─── CLOSER ─── */
+    .closer-h {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 8vw, 3rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .closer-h em { font-style: italic; font-weight: 400; color: var(--glow); }
+
+    .btn {
+      display: inline-block;
+      background: var(--purple); color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 500;
+      padding: 15px 34px; border-radius: 100px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn:hover { background: var(--violet); transform: translateY(-1px); }
+
+    .hint {
+      font-size: 0.73rem; color: var(--softer);
+      font-weight: 300; margin-top: 12px;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 24px 28px; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    footer p { font-size: 0.68rem; font-weight: 300; color: rgba(255,255,255,0.18); }
+
+    /* ─── REVEAL ─── */
+    .reveal {
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .reveal.in { opacity: 1; transform: none; }
+    .r2 { transition-delay: 0.13s; }
+    .r3 { transition-delay: 0.26s; }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">DOPA<strong>mine</strong></a>
+    <a href="app.html" class="nav-link">Open the app →</a>
+  </nav>
+
+  <!-- ══════ HERO ══════ -->
+  <section class="hero">
+
+    <h1 class="title">
+      <span class="t-action">Write all your<br>daily wins,</span>
+      <span class="t-reaction">see how much happier<br>you get every day.</span>
+    </h1>
+
+    <p class="subtitle">
+      Capture every good moment as it happens.
+      The more you log, the more happiness compounds.
+    </p>
+
+    <!-- WHITE INPUT BOX -->
+    <div class="capture-box" onclick="document.getElementById('win-input').focus()">
+      <div class="capture-label">Log a win</div>
+      <textarea id="win-input" class="capture-input" rows="3">I just had a delicious ice cream 🍦</textarea>
+      <div class="capture-footer">
+        <button class="photo-btn" onclick="event.stopPropagation(); window.location.href='app.html'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          Add a photo
+        </button>
+        <a href="app.html" class="save-btn">Save it →</a>
+      </div>
+    </div>
+
+    <div class="examples">
+      <p class="examples-label">More examples of small wins:</p>
+      <span class="pill" onclick="fillInput('My morning coffee was absolutely perfect')">Perfect coffee</span>
+      <span class="pill" onclick="fillInput('Made a colleague laugh today')">Made someone laugh</span>
+      <span class="pill" onclick="fillInput('Got outside for a walk today')">Got outside</span>
+      <span class="pill" onclick="fillInput('Finished something I was putting off')">Finished something</span>
+      <span class="pill" onclick="fillInput('Caught a beautiful sunset tonight')">Caught the sunset</span>
+    </div>
+
+  </section>
+
+  <!-- ══════ COMPOUND INTEREST ══════ -->
+  <div class="wrap">
+    <h2 class="sec-h reveal">
+      Like compound interest —<br>
+      <em>for how you feel.</em>
+    </h2>
+    <div class="prose">
+      <p class="reveal r2">
+        One win logged today doesn't feel like much.
+        But <strong>ten wins a day, every day, for two weeks</strong> —
+        that starts to change something real.
+      </p>
+      <p class="reveal r3">
+        Your brain learns what you consistently show it.
+        Show it good things, repeatedly, and it starts finding them
+        on its own — before you even open the app.
+        <strong>That's when the feeling becomes permanent.</strong>
+      </p>
+    </div>
+
+    <!-- Bar chart -->
+    <div class="chart-wrap reveal">
+      <p class="chart-label">Happiness level — week by week</p>
+      <div class="bars">
+        <div class="bar-col"><div class="bar" style="height:14px"></div><span class="bar-d">Wk 1</span></div>
+        <div class="bar-col"><div class="bar" style="height:22px"></div><span class="bar-d">Wk 2</span></div>
+        <div class="bar-col"><div class="bar" style="height:32px"></div><span class="bar-d">Wk 3</span></div>
+        <div class="bar-col"><div class="bar" style="height:45px"></div><span class="bar-d">Wk 4</span></div>
+        <div class="bar-col"><div class="bar" style="height:58px"></div><span class="bar-d">Wk 5</span></div>
+        <div class="bar-col"><div class="bar lit" style="height:72px"></div><span class="bar-d">Wk 6</span></div>
+        <div class="bar-col"><div class="bar lit" style="height:88px"></div><span class="bar-d">Wk 7</span></div>
+      </div>
+      <p class="chart-caption">
+        It doesn't happen overnight. <strong>That's the point.</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ THE DOPAMINE LOOP ══════ -->
+  <div class="wrap">
+    <h2 class="sec-h reveal">
+      The dopamine loop<br>
+      <em>you are building.</em>
+    </h2>
+
+    <!-- Scientific loop diagram with labels below -->
+    <div class="loop-outer reveal r2">
+
+    <svg class="loop-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- Track -->
+      <circle cx="150" cy="150" r="100"
+        fill="none" stroke="rgba(181,123,247,0.15)" stroke-width="1.5" stroke-dasharray="3 8"/>
+
+      <!-- Center branding -->
+      <text x="150" y="153" text-anchor="middle" dominant-baseline="central">
+        <tspan font-family="DM Sans,sans-serif" font-weight="700" font-size="11" fill="rgba(255,255,255,0.9)" letter-spacing="0.5">DOPA</tspan><tspan font-family="DM Sans,sans-serif" font-weight="300" font-size="11" fill="#B57BF7">mine</tspan>
+      </text>
+
+      <!-- NODE 1: TOP — Daily win -->
+      <g class="n1">
+        <circle class="node-ring" cx="150" cy="50" r="34" fill="rgba(123,47,190,0.18)"/>
+        <circle cx="150" cy="50" r="28"
+          fill="#130C26" stroke="rgba(181,123,247,0.45)" stroke-width="1.5"/>
+        <text x="150" y="53" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-weight="500"
+          font-size="6.5" fill="rgba(255,255,255,0.9)" letter-spacing="0.3">NOTICE</text>
+      </g>
+
+      <!-- NODE 2: RIGHT — Optimism -->
+      <g class="n2">
+        <circle class="node-ring" cx="250" cy="150" r="34" fill="rgba(123,47,190,0.18)"/>
+        <circle cx="250" cy="150" r="28"
+          fill="#130C26" stroke="rgba(181,123,247,0.45)" stroke-width="1.5"/>
+        <text x="250" y="153" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-weight="500"
+          font-size="6.5" fill="rgba(255,255,255,0.9)" letter-spacing="0.3">SIGNAL</text>
+      </g>
+
+      <!-- NODE 3: BOTTOM — Your dopamine -->
+      <g class="n3">
+        <circle class="node-ring" cx="150" cy="250" r="34" fill="rgba(123,47,190,0.18)"/>
+        <circle cx="150" cy="250" r="28"
+          fill="#130C26" stroke="rgba(181,123,247,0.45)" stroke-width="1.5"/>
+        <text x="150" y="253" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-weight="500"
+          font-size="6.5" fill="rgba(255,255,255,0.9)" letter-spacing="0.3">REWARD</text>
+      </g>
+
+      <!-- NODE 4: LEFT — Happiness -->
+      <g class="n4">
+        <circle class="node-ring" cx="50" cy="150" r="34" fill="rgba(123,47,190,0.18)"/>
+        <circle cx="50" cy="150" r="28"
+          fill="#130C26" stroke="rgba(181,123,247,0.45)" stroke-width="1.5"/>
+        <text x="50" y="153" text-anchor="middle"
+          font-family="DM Sans,sans-serif" font-weight="500"
+          font-size="6.5" fill="rgba(255,255,255,0.9)" letter-spacing="0.3">REPEAT</text>
+      </g>
+
+      <!-- Orbit trail -->
+      <g class="orbit-trail">
+        <circle cx="150" cy="50" r="5" fill="rgba(181,123,247,0.28)"/>
+      </g>
+
+      <!-- Orbit dot -->
+      <g class="orbit-arm">
+        <circle cx="150" cy="50" r="9" fill="#B57BF7" opacity="0.9"/>
+      </g>
+
+    </svg>
+
+      <!-- 2x2 label grid -->
+      <div class="loop-labels">
+        <div>
+          <span class="ll-name">Notice</span>
+          <p class="ll-desc">You spot something good. A moment worth keeping.</p>
+        </div>
+        <div>
+          <span class="ll-name">Signal</span>
+          <p class="ll-desc">Your brain registers the moment as meaningful.</p>
+        </div>
+        <div>
+          <span class="ll-name">Reward</span>
+          <p class="ll-desc">Dopamine is released. Small. Real. Immediate.</p>
+        </div>
+        <div>
+          <span class="ll-name">Repeat</span>
+          <p class="ll-desc">The habit reinforces. Brain seeks more.</p>
+        </div>
+      </div>
+
+    </div><!-- end loop-outer -->
+
+    <div class="prose reveal r3">
+      <p>
+        Every win you capture sends a signal to your brain.
+        <strong>That signal is dopamine.</strong>
+        Repeat it enough, and your brain builds a preference —
+        it begins scanning your environment for good things
+        automatically, because that is what gets rewarded.
+      </p>
+      <p>
+        This is not motivation. This is not positive thinking.
+        <strong>This is neuroscience.</strong>
+        You are literally reshaping the neural pathways
+        that determine how you experience daily life.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ HOW TO USE IT ══════ -->
+  <div class="wrap">
+    <h2 class="sec-h reveal">
+      Built for<br><em>zero friction.</em>
+    </h2>
+
+    <div class="step reveal r2">
+      <span class="step-n">1</span>
+      <p class="step-text">
+        <strong>Something good happens — open the app and log it.</strong>
+        Takes three seconds. That is the whole interaction.
+        No journaling. No reflection. No effort.
+      </p>
+    </div>
+    <div class="step reveal r2">
+      <span class="step-n">2</span>
+      <p class="step-text">
+        <strong>Do it as many times a day as you can.</strong>
+        Three is good. Five is great. Ten means your brain
+        is already starting to see the world differently.
+      </p>
+    </div>
+    <div class="step reveal r3">
+      <span class="step-n">3</span>
+      <p class="step-text">
+        <strong>Show up every single day.</strong>
+        Consistency over time is what creates the compound effect —
+        not any individual entry.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ GYM + DIET ══════ -->
+  <div class="wrap">
+    <h2 class="sec-h reveal">
+      You already know<br>
+      <em>how this works.</em>
+    </h2>
+
+    <div class="analogy reveal r2">
+      <div class="analogy-title">Like going to the gym.</div>
+      <p class="analogy-body">
+        One workout does not change your body.
+        But showing up consistently — even for 20 minutes —
+        transforms you over months.
+        <strong>DOPAmine is your daily rep for happiness.</strong>
+        Each win you log is a rep. Each day you show up is a session.
+        Miss one day and you have not failed. Miss two weeks
+        and you have lost the compound effect. That is the only rule.
+      </p>
+    </div>
+
+    <div class="analogy-rule"></div>
+
+    <div class="analogy reveal r3">
+      <div class="analogy-title">Like eating well.</div>
+      <p class="analogy-body">
+        One salad does not make you healthy.
+        One bad meal does not destroy you.
+        It is the pattern over time that shapes how you feel every day.
+        <strong>Logging wins is feeding your brain good information,
+        consistently.</strong>
+        The compound effect is real — and it works
+        exactly the same way.
+      </p>
+    </div>
+  </div>
+
+  <!-- ══════ CLOSER ══════ -->
+  <div class="wrap" style="text-align: center; padding-bottom: 88px;">
+    <h2 class="closer-h reveal">
+      Your wins are<br>already happening.<br>
+      <em>Start counting them.</em>
+    </h2>
+    <p class="prose reveal r2" style="margin-bottom: 32px; max-width: 300px; margin-left: auto; margin-right: auto;">
+      Free. No account. No app store needed.
+    </p>
+    <a href="app.html" class="btn reveal r2">Open DOPAmine →</a>
+    <p class="hint reveal r3" style="margin-top: 14px;">
+      Add to home screen for one-tap access throughout your day
+    </p>
+  </div>
+
+  <footer>
+    <p>DOPAmine — your brain on good things.</p>
+  </footer>
+
+  <script>
+    function fillInput(text) {
+      const el = document.getElementById('win-input');
+      el.value = text; el.focus();
+    }
+    const obs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  </script>
+
+</body>
+</html>
