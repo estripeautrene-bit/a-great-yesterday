@@ -1996,27 +1996,32 @@
     /* ── Yesterday tab ── */
     .yesterday-hero {
       text-align: center;
-      padding: 28px 0 20px;
+      padding: 28px 20px 20px;
+      background: linear-gradient(135deg, rgba(123,47,190,0.2), rgba(14,11,26,0.5));
+      border-radius: 16px;
+      margin-bottom: 16px;
     }
 
     .yesterday-headline {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--dark);
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: white;
       line-height: 1.2;
       margin-bottom: 8px;
     }
 
     .yesterday-subtitle {
       font-size: 0.92rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.6);
     }
 
     .yesterday-empty {
       font-size: 0.95rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.4);
       line-height: 1.6;
       font-style: italic;
+      text-align: center;
+      padding: 40px 0;
     }
 
     .yesterday-card {
@@ -2255,6 +2260,9 @@
     <!-- Science visual card -->
     <div class="science-card" id="scienceQuote"></div>
 
+    <!-- Today's entries -->
+    <div id="todayEntriesSection" style="margin-top:20px;"></div>
+
   </div>
 
   <!-- YESTERDAY VIEW -->
@@ -2266,7 +2274,6 @@
     <div id="yesterdayWisdom"></div>
     <div id="yesterdayQuestion"></div>
     <div class="yesterday-list" id="yesterdayList"></div>
-    <div id="yesterdayFeel"></div>
     <button class="yesterday-start-btn" onclick="switchTab('log')">Start Today →</button>
   </div>
 
@@ -2321,6 +2328,137 @@
     // ── Helpers ──────────────────────────────────────────────
     const STORAGE_KEY = 'greatYesterday_moments';
     const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // ── Supabase config ──────────────────────────────────────
+    const SUPABASE_URL = 'https://qcfoykmmbjvduspunvsb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjZm95a21tYmp2ZHVzcHVudnNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MTc1OTAsImV4cCI6MjA5Mjk5MzU5MH0.9WwCW0pbbciBy3sUO9Y6qpQK6-LclMCRUuF9cr_NEOE';
+
+    // Generate or retrieve anonymous user ID
+    const USER_ID_KEY = 'dopamine_user_id';
+    function getUserId() {
+      let uid = localStorage.getItem(USER_ID_KEY);
+      if (!uid) {
+        uid = 'user_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+        localStorage.setItem(USER_ID_KEY, uid);
+      }
+      return uid;
+    }
+
+    // ── Supabase API helpers ──────────────────────────────────
+    async function sbInsert(moment) {
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/moments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal',
+            'X-Client-Info': 'dopamine-app'
+          },
+          body: JSON.stringify({
+            user_id: getUserId(),
+            text: moment.text,
+            tags: JSON.stringify(moment.tags || []),
+            auto_tag: moment.autoTag || null,
+            photo: null, // skip photo for now — too large for API
+            date_key: moment.dateKey,
+            created_at: moment.createdAt
+          })
+        });
+        if (!response.ok) {
+          const err = await response.text();
+          console.warn('Supabase insert error:', response.status, err);
+          return false;
+        }
+        return true;
+      } catch (e) {
+        console.warn('Supabase insert failed:', e.message);
+        return false;
+      }
+    }
+
+    async function sbLoadAll() {
+      try {
+        const uid = getUserId();
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/moments?user_id=eq.${encodeURIComponent(uid)}&order=created_at.desc&limit=1000`,
+          {
+            method: 'GET',
+            headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        if (!response.ok) {
+          const err = await response.text();
+          console.warn('Supabase load error:', response.status, err);
+          return null;
+        }
+        const rows = await response.json();
+        return rows.map(r => ({
+          id: r.id,
+          text: r.text,
+          tags: JSON.parse(r.tags || '[]'),
+          autoTag: r.auto_tag,
+          photo: r.photo,
+          dateKey: r.date_key,
+          createdAt: r.created_at
+        }));
+      } catch (e) {
+        // Silently fail — app works offline, localStorage is primary
+        return null;
+      }
+    }
+
+    // ── Sync: load from Supabase and merge into localStorage ──
+    async function syncFromCloud() {
+      const cloudMoments = await sbLoadAll();
+      if (!cloudMoments || cloudMoments.length === 0) return;
+
+      const local = loadMoments();
+      const localIds = new Set(local.map(m => m.createdAt));
+
+      // Merge: add any cloud moments not in local
+      let added = 0;
+      for (const cm of cloudMoments) {
+        if (!localIds.has(cm.createdAt)) {
+          local.push(cm);
+          added++;
+        }
+      }
+
+      if (added > 0) {
+        local.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        saveMoments(local);
+        console.log(`Synced ${added} moments from cloud`);
+        // Refresh UI
+        updateLogStreak();
+        renderTodayEntries();
+      }
+    }
+
+    // ── Push all local moments to cloud (first-time sync) ────
+    async function pushLocalToCloud() {
+      const synced = localStorage.getItem('dopamine_synced');
+      if (synced) return; // Already done initial sync
+
+      const moments = loadMoments();
+      if (moments.length === 0) return;
+
+      let pushed = 0;
+      for (const m of moments) {
+        const ok = await sbInsert(m);
+        if (ok) pushed++;
+      }
+
+      if (pushed > 0) {
+        localStorage.setItem('dopamine_synced', 'true');
+        console.log(`Pushed ${pushed} local moments to cloud`);
+      }
+    }
 
     function loadMoments() {
       try {
@@ -2469,19 +2607,116 @@
       // Scroll panel into view
       setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
     }
-    // ── Share progress ───────────────────────────────────────
+    // ── Share progress as visual card ────────────────────────
     function shareProgress() {
       const moments = loadMoments();
       const streak = calcStreak(moments);
-      if (navigator.share) {
-        navigator.share({
-          title: 'DOPAmine — My Progress',
-          text: `🔥 ${streak} day streak · ${moments.length} good moments captured\n\nBuilding my dopamine from the inside.\n\nmydopa.app`,
-          url: 'https://mydopa.app'
-        }).catch(() => {});
-      } else {
-        showToast('Screenshot your progress card and share it! 📸');
-      }
+      const totalDays = new Set(moments.map(m => m.dateKey)).size;
+      const total = moments.length;
+      const meaning = getStreakMeaning(streak);
+
+      // Build canvas card
+      const canvas = document.createElement('canvas');
+      const W = 1080, H = 1080;
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Background gradient
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0, '#0E0B1A');
+      bg.addColorStop(1, '#2D1B69');
+      ctx.fillStyle = bg;
+      ctx.roundRect(0, 0, W, H, 40);
+      ctx.fill();
+
+      // Purple glow circle
+      const glow = ctx.createRadialGradient(W*0.8, H*0.2, 0, W*0.8, H*0.2, 300);
+      glow.addColorStop(0, 'rgba(123,47,190,0.4)');
+      glow.addColorStop(1, 'rgba(123,47,190,0)');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Logo — DOPA mine
+      ctx.font = 'bold 72px -apple-system, Arial';
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'center';
+      ctx.fillText('DOPA', W/2 - 60, 160);
+      ctx.font = '300 72px -apple-system, Arial';
+      ctx.fillStyle = '#B57BF7';
+      ctx.fillText('mine', W/2 + 80, 160);
+
+      // Big number
+      ctx.font = 'bold 280px -apple-system, Arial';
+      const numGrad = ctx.createLinearGradient(0, 300, 0, 600);
+      numGrad.addColorStop(0, '#ffffff');
+      numGrad.addColorStop(1, '#B57BF7');
+      ctx.fillStyle = numGrad;
+      ctx.textAlign = 'center';
+      ctx.fillText(total, W/2, 560);
+
+      // Label
+      ctx.font = '400 48px -apple-system, Arial';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.letterSpacing = '6px';
+      ctx.fillText('GOOD MOMENTS CAPTURED', W/2, 630);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(123,47,190,0.5)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(120, 690);
+      ctx.lineTo(W-120, 690);
+      ctx.stroke();
+
+      // Stats row
+      ctx.font = 'bold 80px -apple-system, Arial';
+      ctx.fillStyle = '#B57BF7';
+      ctx.textAlign = 'center';
+      ctx.fillText('🔥 ' + streak, W/2 - 200, 790);
+      ctx.fillText(totalDays, W/2 + 200, 790);
+
+      ctx.font = '400 36px -apple-system, Arial';
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillText('DAY STREAK', W/2 - 200, 840);
+      ctx.fillText('ACTIVE DAYS', W/2 + 200, 840);
+
+      // Meaning message
+      ctx.font = 'italic 400 40px -apple-system, Arial';
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.fillText(meaning, W/2, 930);
+
+      // Tagline
+      ctx.font = '400 36px -apple-system, Arial';
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillText('mydopa.app', W/2, 1010);
+
+      // Convert to blob and share
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'dopamine-progress.png', { type: 'image/png' });
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'My DOPAmine Progress',
+              text: `🔥 ${streak} day streak · ${total} good moments · mydopa.app`
+            });
+          } catch (e) {
+            downloadCard(canvas);
+          }
+        } else {
+          downloadCard(canvas);
+        }
+      }, 'image/png');
+    }
+
+    function downloadCard(canvas) {
+      const link = document.createElement('a');
+      link.download = 'dopamine-progress.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('Card saved! Share it on Instagram or WhatsApp 📸');
     }
 
     function openNextStep() {
@@ -2546,6 +2781,39 @@
     resetPromptTimer();
     const THEME_KEY = 'dopamine_theme';
 
+    // ── Render today's entries on Today tab ──────────────────
+    function renderTodayEntries() {
+      const section = document.getElementById('todayEntriesSection');
+      if (!section) return;
+      const moments = loadMoments().filter(m => m.dateKey === todayKey())
+        .slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+      if (moments.length === 0) {
+        section.innerHTML = '';
+        return;
+      }
+
+      section.innerHTML = `
+        <div class="progress-section-label">Today's Moments — ${moments.length}</div>
+        ${moments.map(m => `
+          <div class="moment-card" id="mc-${m.id}">
+            <div class="moment-dot"></div>
+            <div class="moment-body">
+              <div class="moment-text">${escapeHtml(m.text)}</div>
+              ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
+              <div class="moment-meta">
+                <span class="moment-time">${formatTime(m.createdAt)}</span>
+                ${(m.tags || []).map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}
+                ${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
+              </div>
+            </div>
+            <button class="moment-edit" onclick="openEditModal(${m.id})" title="Edit">✏️</button>
+            <button class="moment-delete" onclick="deleteMoment(${m.id})" title="Remove">✕</button>
+          </div>
+        `).join('')}
+      `;
+    }
+
     function toggleTheme() {
       const isLight = document.body.classList.toggle('light-mode');
       localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
@@ -2584,6 +2852,13 @@
     initTheme();
     initName();
     checkReEngagement();
+    renderTodayEntries();
+
+    // Cloud sync — runs in background after page loads
+    window.addEventListener('load', () => {
+      setTimeout(pushLocalToCloud, 3000);
+      setTimeout(syncFromCloud, 5000);
+    });
 
     // Auto-focus textarea on load if no name modal is shown
     if (localStorage.getItem(NAME_KEY)) {
@@ -3074,7 +3349,7 @@
       const momentsBefore = loadMoments();
       const streakBefore = calcStreak(momentsBefore);
 
-      momentsBefore.unshift({
+      const newMoment = {
         id: Date.now(),
         text,
         tags: getSelectedTags(),
@@ -3082,8 +3357,13 @@
         createdAt: new Date().toISOString(),
         dateKey: todayKey(),
         photo: currentPhotoData || null,
-      });
+      };
+
+      momentsBefore.unshift(newMoment);
       saveMoments(momentsBefore);
+
+      // Save to Supabase in background
+      sbInsert(newMoment);
 
       const streakAfter = calcStreak(momentsBefore);
 
@@ -3097,6 +3377,7 @@
 
       showToast('Moment saved! 🌟');
       updateLogStreak();
+      renderTodayEntries();
       checkStreakMilestone(streakBefore, streakAfter);
     }
 
@@ -3305,66 +3586,6 @@
       document.getElementById('reflectSaved').style.display = 'block';
     }
 
-    function renderYesterday() {
-      const yKey = yesterdayKey();
-      const moments = loadMoments().filter(m => m.dateKey === yKey)
-        .slice().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-
-      const subtitle = document.getElementById('yesterdaySubtitle');
-      const list = document.getElementById('yesterdayList');
-      const wisdom = document.getElementById('yesterdayWisdom');
-      const feel = document.getElementById('yesterdayFeel');
-
-      if (moments.length === 0) {
-        subtitle.innerHTML = '';
-        wisdom.innerHTML = '';
-        feel.innerHTML = '';
-        list.innerHTML = `<p class="yesterday-empty">Yesterday is a blank page.<br>Today doesn't have to be.</p>`;
-        return;
-      }
-
-      // ── Subtitle ──
-      subtitle.textContent = `You chose to notice ${moments.length} time${moments.length !== 1 ? 's' : ''} yesterday.`;
-
-      // ── Smart wisdom seed ──
-      const seed = getWisdomSeed(moments);
-      wisdom.innerHTML = `
-        <div class="wisdom-seed">
-          <div class="wisdom-seed-label">✦ From the DOPAmine philosophy</div>
-          <div class="wisdom-seed-text">${seed}</div>
-        </div>`;
-
-      // ── Entries ──
-      list.innerHTML = moments.map(m => `
-        <div class="yesterday-card">
-          <div class="moment-text">${escapeHtml(m.text)}</div>
-          ${m.photo ? `<img class="card-photo" src="${m.photo}" alt="moment" />` : ''}
-          <div class="moment-meta">
-            <span class="moment-time">${formatTime(m.createdAt)}</span>
-            ${(m.tags || []).map(t => `<span class="moment-tag">${escapeHtml(t)}</span>`).join('')}
-            ${m.autoTag ? `<span class="moment-tag-auto">${escapeHtml(m.autoTag)}</span>` : ''}
-          </div>
-        </div>
-      `).join('');
-
-      // ── Reflection question ──
-      const { question, pillar } = getReflectionQuestion(moments);
-      const pillarLabel = { mindset: '🧠 Mindset', body: '💪 Body', emotions: '❤️ Emotions', goals: '🎯 Goals' }[pillar];
-      const savedReflection = localStorage.getItem(REFLECT_Q_KEY + yKey);
-
-      feel.innerHTML = `
-        <div class="feel-section">
-          <div class="feel-label">${question}</div>
-          <textarea class="feel-textarea" id="reflectInput"
-            placeholder="Take a moment to reflect..."
-            ${savedReflection ? 'disabled' : ''}>${savedReflection || ''}</textarea>
-          ${savedReflection
-            ? `<div id="reflectSaved" style="text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
-            : `<button class="feel-save-btn" id="reflectSaveBtn" onclick="saveReflection()">Save my reflection</button>
-               <div id="reflectSaved" style="display:none;text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Reflected ✓</div>`
-          }
-        </div>`;
-    }
     const WISDOM_SEEDS = {
       mindset: [
         "Trust your consistency more than you trust your feelings. Trust your doing more than your feeling.",
@@ -3426,17 +3647,9 @@
       return pool[idx];
     }
 
-    const FEEL_KEY = 'dopamine_feel_';
+    const FEEL_KEY = 'dopamine_feel_'; // kept for backwards compatibility
 
-    function saveFeeling() {
-      const yKey = yesterdayKey();
-      const text = document.getElementById('feelInput').value.trim();
-      if (!text) return;
-      localStorage.setItem(FEEL_KEY + yKey, text);
-      document.getElementById('feelInput').disabled = true;
-      document.getElementById('feelSaveBtn').style.display = 'none';
-      document.getElementById('feelSaved').style.display = 'block';
-    }
+    function saveFeeling() {} // deprecated — feel section removed
 
     function renderYesterday() {
       const yKey = yesterdayKey();
@@ -3447,13 +3660,11 @@
       const list = document.getElementById('yesterdayList');
       const wisdom = document.getElementById('yesterdayWisdom');
       const questionEl = document.getElementById('yesterdayQuestion');
-      const feel = document.getElementById('yesterdayFeel');
 
       if (moments.length === 0) {
         subtitle.innerHTML = '';
         wisdom.innerHTML = '';
         if (questionEl) questionEl.innerHTML = '';
-        feel.innerHTML = '';
         list.innerHTML = `<p class="yesterday-empty">Yesterday is a blank page.<br>Today doesn't have to be.</p>`;
         return;
       }
@@ -3499,22 +3710,6 @@
           </div>
         </div>
       `).join('');
-
-      // ── How do you feel (bottom) ──
-      const savedFeeling = localStorage.getItem(FEEL_KEY + yKey);
-      feel.innerHTML = `
-        <div class="feel-section">
-          <div class="feel-label">How does yesterday make you feel today?</div>
-          <textarea class="feel-textarea" id="feelInput"
-            placeholder="Write how you feel after seeing yesterday's good moments..."
-            spellcheck="true" autocorrect="on" autocapitalize="sentences"
-            ${savedFeeling ? 'disabled' : ''}>${savedFeeling || ''}</textarea>
-          ${savedFeeling
-            ? `<div id="feelSaved" style="text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Saved ✓</div>`
-            : `<button class="feel-save-btn" id="feelSaveBtn" onclick="saveFeeling()">Save how I feel</button>
-               <div id="feelSaved" style="display:none;text-align:center;font-size:0.8rem;color:#B57BF7;margin-top:8px;font-style:italic;">Saved ✓</div>`
-          }
-        </div>`;
     }
 
     // ── Summary ──────────────────────────────────────────────
