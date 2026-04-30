@@ -1685,6 +1685,23 @@
       border-color: rgba(255,255,255,0.3) !important;
       background: rgba(255,255,255,0.15) !important;
     }
+
+    .visual-share-card,
+    .visual-share-card .vsc-brand,
+    .visual-share-card .vsc-number,
+    .visual-share-card .vsc-label,
+    .visual-share-card .vsc-tagline,
+    .visual-share-card .vsc-tagline strong {
+      color: white !important;
+    }
+    .visual-share-card .vsc-number {
+      text-shadow: 0 0 30px rgba(255,255,255,0.4) !important;
+    }
+    .visual-share-card .vsc-streak {
+      color: #e0b8ff !important;
+      border-color: rgba(255,255,255,0.3) !important;
+      background: rgba(255,255,255,0.15) !important;
+    }
   </style>
 </head>
 <body>
@@ -2304,18 +2321,171 @@
 
     renderTodayEntries();
 
-    // ── Share progress ────────────────────────────────────
-    function shareProgress() {
+    // ── Share progress (Canvas image) ────────────────────
+    async function shareProgress() {
       const moments = loadMoments();
-      const streak = calcStreak(moments);
-      const text = `I've captured ${moments.length} good moments and I'm on a ${streak}-day streak with DOPAmine — training my brain to find good every day. Try it at mydopa.app`;
-      if (navigator.share) {
-        navigator.share({ title: 'My DOPAmine Progress', text, url: 'https://mydopa.app' })
-          .catch(() => {});
-      } else {
-        navigator.clipboard.writeText(text)
-          .then(() => showToast('Copied to clipboard! 📋'))
-          .catch(() => showToast('Share: ' + text));
+      const streak  = calcStreak(moments);
+      const total   = moments.length;
+
+      showToast('Generating image...');
+
+      try {
+        // ── Build canvas ──────────────────────────────────
+        const W = 1080, H = 1080;
+        const canvas = document.createElement('canvas');
+        canvas.width  = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // Background gradient
+        const bg = ctx.createLinearGradient(0, 0, W, H);
+        bg.addColorStop(0,   '#3d1278');
+        bg.addColorStop(0.5, '#2a0d5e');
+        bg.addColorStop(1,   '#1a0840');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // Top radial glow
+        const glow = ctx.createRadialGradient(W/2, 160, 0, W/2, 160, 440);
+        glow.addColorStop(0, 'rgba(123,47,190,0.55)');
+        glow.addColorStop(1, 'rgba(123,47,190,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, W, H);
+
+        // Bottom-right accent glow
+        const glow2 = ctx.createRadialGradient(W, H, 0, W, H, 500);
+        glow2.addColorStop(0, 'rgba(181,123,247,0.22)');
+        glow2.addColorStop(1, 'rgba(181,123,247,0)');
+        ctx.fillStyle = glow2;
+        ctx.fillRect(0, 0, W, H);
+
+        // Border
+        const br = 56;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(br, 0); ctx.lineTo(W-br, 0);
+        ctx.quadraticCurveTo(W, 0, W, br);
+        ctx.lineTo(W, H-br);
+        ctx.quadraticCurveTo(W, H, W-br, H);
+        ctx.lineTo(br, H);
+        ctx.quadraticCurveTo(0, H, 0, H-br);
+        ctx.lineTo(0, br);
+        ctx.quadraticCurveTo(0, 0, br, 0);
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(181,123,247,0.65)';
+        ctx.lineWidth   = 8;
+        ctx.stroke();
+        ctx.clip();
+
+        // ── Text — use only system fonts, no emoji in canvas ──
+        ctx.textAlign    = 'center';
+        ctx.textBaseline = 'alphabetic';
+
+        // Brand
+        ctx.font      = '700 40px sans-serif';
+        ctx.fillStyle = 'rgba(181,123,247,0.85)';
+        ctx.fillText('D O P A m i n e', W/2, 210);
+
+        // Decorative line
+        ctx.strokeStyle = 'rgba(181,123,247,0.3)';
+        ctx.lineWidth   = 2;
+        ctx.beginPath();
+        ctx.moveTo(240, 240); ctx.lineTo(W-240, 240);
+        ctx.stroke();
+
+        // Big number with gradient
+        const numGrad = ctx.createLinearGradient(0, 300, 0, 570);
+        numGrad.addColorStop(0, '#ffffff');
+        numGrad.addColorStop(1, '#B57BF7');
+        ctx.fillStyle  = numGrad;
+        ctx.shadowColor = 'rgba(181,123,247,0.7)';
+        ctx.shadowBlur  = 70;
+        ctx.font = `900 ${total >= 1000 ? 210 : 260}px sans-serif`;
+        ctx.fillText(String(total), W/2, 565);
+        ctx.shadowBlur = 0;
+
+        // Moments label
+        ctx.font      = '300 46px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.60)';
+        ctx.fillText('good moments captured', W/2, 645);
+
+        // Streak pill background
+        const pillW = 460, pillH = 80, pillX = (W-pillW)/2, pillY = 700;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(pillX, pillY, pillW, pillH, 40)
+          : (()=>{
+              ctx.moveTo(pillX+40,pillY); ctx.lineTo(pillX+pillW-40,pillY);
+              ctx.quadraticCurveTo(pillX+pillW,pillY,pillX+pillW,pillY+40);
+              ctx.lineTo(pillX+pillW,pillY+pillH-40);
+              ctx.quadraticCurveTo(pillX+pillW,pillY+pillH,pillX+pillW-40,pillY+pillH);
+              ctx.lineTo(pillX+40,pillY+pillH);
+              ctx.quadraticCurveTo(pillX,pillY+pillH,pillX,pillY+pillH-40);
+              ctx.lineTo(pillX,pillY+40);
+              ctx.quadraticCurveTo(pillX,pillY,pillX+40,pillY);
+              ctx.closePath();
+            })();
+        ctx.fillStyle   = 'rgba(255,255,255,0.12)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth   = 2;
+        ctx.stroke();
+
+        // Streak text (fire emoji works in fillText on modern iOS/Android)
+        ctx.font      = '600 40px sans-serif';
+        ctx.fillStyle = '#e0b8ff';
+        ctx.fillText(
+          '\uD83D\uDD25 ' + streak + ' day' + (streak !== 1 ? 's' : '') + ' streak',
+          W/2, pillY + 52
+        );
+
+        // Tagline
+        ctx.font      = '300 36px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.32)';
+        ctx.fillText('Training my brain to find good.', W/2, 858);
+
+        ctx.font      = '600 36px sans-serif';
+        ctx.fillStyle = 'rgba(181,123,247,0.80)';
+        ctx.fillText('mydopa.app', W/2, 912);
+
+        ctx.restore();
+
+        // ── Convert canvas → dataURL → Blob (most compatible path) ──
+        const dataURL = canvas.toDataURL('image/png');
+
+        // dataURL → Blob via fetch (avoids FileReader quirks on iOS)
+        const fetchRes = await fetch(dataURL);
+        const blob     = await fetchRes.blob();
+        const file     = new File([blob], 'dopamine-progress.png', { type: 'image/png' });
+
+        // ── Try native share sheet with image file ──
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'My DOPAmine Progress',
+              text:  `${total} good moments. ${streak}-day streak. mydopa.app`
+            });
+            return;
+          } catch (e) {
+            if (e.name === 'AbortError') return; // user cancelled
+            // fall through to download
+          }
+        }
+
+        // ── Fallback: save image to device ──
+        const objURL = URL.createObjectURL(blob);
+        const a      = document.createElement('a');
+        a.href        = objURL;
+        a.download    = 'dopamine-progress.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(objURL), 1000);
+        showToast('Image saved to your device! \uD83D\uDDBC\uFE0F');
+
+      } catch (err) {
+        console.error('shareProgress error:', err);
+        showToast('Could not generate image \u2014 try again');
       }
     }
 
