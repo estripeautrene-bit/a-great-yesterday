@@ -1515,11 +1515,57 @@
       color: #DC2626;
       cursor: pointer;
     }
+
+    .visual-share-card {
+      background: linear-gradient(135deg, #1a0533 0%, #0E0B1A 60%, #2d1060 100%);
+      border-radius: 20px; padding: 28px 24px;
+      border: 1px solid rgba(181,123,247,0.3);
+      margin-bottom: 16px; position: relative;
+      overflow: hidden; text-align: center;
+    }
+    .visual-share-card::before {
+      content: ''; position: absolute;
+      top: -40px; left: 50%; transform: translateX(-50%);
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(123,47,190,0.4) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .vsc-brand { font-size:0.65rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:rgba(181,123,247,0.7); margin-bottom:16px; }
+    .vsc-number { font-size:3.5rem; font-weight:800; color:white; line-height:1; margin-bottom:4px; text-shadow:0 0 30px rgba(181,123,247,0.5); }
+    .vsc-label { font-size:0.85rem; font-weight:300; color:rgba(255,255,255,0.65); margin-bottom:16px; }
+    .vsc-streak { display:inline-block; background:rgba(181,123,247,0.2); border:1px solid rgba(181,123,247,0.35); border-radius:100px; padding:6px 16px; font-size:0.78rem; font-weight:500; color:#B57BF7; margin-bottom:16px; }
+    .vsc-tagline { font-size:0.72rem; color:rgba(255,255,255,0.35); font-weight:300; line-height:1.6; }
+    .vsc-tagline strong { color:rgba(181,123,247,0.7); font-weight:600; }
+    .share-btn-top { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; background:linear-gradient(135deg,#7B2FBE,#B57BF7); color:white; border:none; border-radius:14px; padding:16px; font-size:1rem; font-weight:700; cursor:pointer; margin-bottom:24px; box-shadow:0 4px 20px rgba(123,47,190,0.45); font-family:inherit; }
+    .share-btn-top:active { transform:scale(0.97); }
+    body.light { background:#F5F3FF; color:#1a0f30; }
+    body.light header { background:linear-gradient(180deg,#fff 0%,#EDE8F5 100%); border-bottom:1px solid rgba(123,47,190,0.15); }
+    body.light .header-logo-name { color:#1a0f30; }
+    body.light .header-logo-tagline { color:rgba(26,15,48,0.45); }
+    body.light .header-greeting { color:rgba(26,15,48,0.6); }
+    body.light header p.date { color:rgba(26,15,48,0.35); }
+    body.light .tabs { background:#EDE8F5; border-bottom:1px solid rgba(123,47,190,0.1); }
+    body.light .tab-btn { color:rgba(26,15,48,0.45); }
+    body.light .tab-btn.active { color:#7B2FBE; border-bottom-color:#7B2FBE; }
+    body.light .prompt-card { background:linear-gradient(135deg,rgba(123,47,190,0.1),rgba(181,123,247,0.05)); border-color:rgba(123,47,190,0.2); }
+    body.light .prompt-text { color:#1a0f30; }
+    body.light .input-area { background:#fff; border-color:rgba(123,47,190,0.2); }
+    body.light .input-area textarea { color:#1a0f30; }
+    body.light .input-area textarea::placeholder { color:rgba(26,15,48,0.3); }
+    body.light .media-btn { border-color:rgba(123,47,190,0.35); color:rgba(26,15,48,0.65); background:rgba(123,47,190,0.06); }
+    body.light .yesterday-hero { background:linear-gradient(135deg,rgba(123,47,190,0.1),rgba(181,123,247,0.05)); border-color:rgba(123,47,190,0.15); }
+    body.light .yesterday-headline { color:#1a0f30; text-shadow:none; }
+    body.light .yesterday-subtitle { color:rgba(26,15,48,0.6); }
+    body.light .yesterday-card { background:#fff; border:1px solid rgba(123,47,190,0.15); border-left:3px solid #7B2FBE; }
+    body.light .yesterday-card .moment-text { color:#1a0f30; }
+    body.light .moment-time { color:rgba(26,15,48,0.45); }
+    body.light .science-card { background:#fff; border-color:rgba(123,47,190,0.2); }
   </style>
 </head>
 <body>
 
-  <header>
+  <header style="position:relative;">
+    <button onclick="toggleTheme()" id="themeToggle" style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(181,123,247,0.4);background:rgba(123,47,190,0.15);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">🌙</button>
     <div class="header-logo">
       <div class="header-logo-d">D</div>
       <div class="header-logo-text">
@@ -2664,6 +2710,20 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
     }
+
+    const THEME_KEY = 'dopamine_theme';
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle('light');
+      localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+      document.getElementById('themeToggle').textContent = isLight ? '☀️' : '🌙';
+    }
+    (function(){
+      if(localStorage.getItem(THEME_KEY)==='light'){
+        document.body.classList.add('light');
+        const btn = document.getElementById('themeToggle');
+        if(btn) btn.textContent = '☀️';
+      }
+    })();
   </script>
   <!-- NEXT STEP MODAL -->
   <div class="next-step-modal" id="nextStepModal">
