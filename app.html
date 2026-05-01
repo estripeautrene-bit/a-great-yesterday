@@ -1722,6 +1722,11 @@
 </head>
 <body>
 
+  <!-- TEMP TEST BUTTON — remove after notification test -->
+  <div id="notifResetBtn" style="position:fixed;bottom:90px;right:16px;z-index:999;background:#7B2FBE;color:white;border-radius:50px;padding:10px 18px;font-size:0.8rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(123,47,190,0.5);" onclick="localStorage.removeItem('dopamine_notif_prompt_shown');localStorage.removeItem('dopamine_notif_time');this.style.display='none';showToast('Ready! Now tap Save on any entry.');">
+    Tap to test notifications
+  </div>
+
   <header style="position:relative;">
     <button onclick="toggleTheme()" id="themeToggle" style="position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(181,123,247,0.4);background:rgba(123,47,190,0.15);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">🌙</button>
     <div class="header-logo">
