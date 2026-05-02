@@ -11,6 +11,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="icon.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="icon.png" />
   <link rel="manifest" href="manifest.json" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <title>DOPAmine</title>
   <style>
     * {
@@ -18,7 +19,6 @@
       margin: 0;
       padding: 0;
     }
-
     :root {
       --gold: #7B2FBE;
       --gold-light: rgba(123,47,190,0.15);
@@ -3130,6 +3130,7 @@
         if(btn) btn.textContent = '☀️';
       }
     })();
+    setTimeout(sbSync, 3000);
   </script>
   <!-- NEXT STEP MODAL -->
   <div class="next-step-modal" id="nextStepModal">
