@@ -1990,7 +1990,7 @@ remote.forEach(rm => { if (!merged.find(lm => String(lm.id)===String(rm.id))) me
         localStorage.setItem(UID_KEY, getUserId());
         renderTodayEntries(); updateLogStreak();
         updateVisualCard(merged, calcStreak(merged));
-        console.log('Synced', merged.length, 'moments');
+        console.log('Synced', merged.length, 'moments');if (document.getElementById('view-summary').classList.contains('active')) renderSummary();
       } catch(e) { console.log('sbSync offline:', e.message); }
     }
 
