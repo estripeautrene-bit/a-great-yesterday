@@ -2157,6 +2157,12 @@ if (document.getElementById('view-summary').classList.contains('active')) render
       showToast("We'll let you know when DOPAmine+ is ready. 💜");
     }
 
+    if (new URLSearchParams(location.search).get('reset_notif') === '1') {
+      localStorage.removeItem('dopamine_notif_prompt_shown');
+      localStorage.removeItem('dopamine_notif_time');
+      location.replace('https://mydopa.app/');
+    }
+
     initName();
     checkReEngagement();
 

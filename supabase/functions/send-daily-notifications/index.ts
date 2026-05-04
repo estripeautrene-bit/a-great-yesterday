@@ -59,6 +59,7 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({}))
     const slot = body.slot as Slot
+    const force = body.force === true
 
     if (!slot || !COPY[slot]) {
       return new Response(
@@ -91,6 +92,7 @@ Deno.serve(async (req) => {
     }
 
     const targets = (subs ?? []).filter(s => {
+      if (force) return true
       const tz = s.timezone ?? 'UTC'
       const now = localHHMM(tz)
       if (slot === 'morning') {
