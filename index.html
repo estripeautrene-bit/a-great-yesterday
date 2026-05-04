@@ -2796,7 +2796,7 @@ if (document.getElementById('view-summary').classList.contains('active')) render
         .map(el => el.textContent.trim());
 
       const moments = loadMoments();
-      const idx = moments.findIndex(m => m.id === editingId);
+      const idx = moments.findIndex(m => String(m.id) === String(editingId));
       if (idx === -1) return;
 
       moments[idx].text = text;
@@ -2806,6 +2806,7 @@ if (document.getElementById('view-summary').classList.contains('active')) render
       saveMoments(moments);
       closeEditModal();
       renderSummary();
+      renderTodayEntries();
       showToast('Updated! ✓');
     }
 
